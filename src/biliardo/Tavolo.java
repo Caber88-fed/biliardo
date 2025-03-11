@@ -66,13 +66,16 @@ public class Tavolo {
 		shell = new Shell();
 		createResourceManager();
 		shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(128, 64, 0))));
-		shell.setSize((284*3), (int)(142*3.5));
+		shell.setSize(852, 497);
 		shell.setText("SWT Application");
 		
 		canvas = new Canvas(shell, SWT.NONE);
 		penna = new GC(canvas);
 		canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
-		canvas.setBounds(25, 25, (284*3)-(40*2), (int)(142*3.5)-(50*2));
+		// con bordo = 25
+		// width = shellWidth - 16 - bordo*2
+		// height = shellHeight - 39 - bordo*2
+		canvas.setBounds(25, 25, 786, 408);
 
 	}
 	private void createResourceManager() {
