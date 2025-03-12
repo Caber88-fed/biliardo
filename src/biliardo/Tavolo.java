@@ -22,6 +22,10 @@ public class Tavolo {
 	GC penna;
 	final int nColonne = 5;
 	Pallina[] p = new Pallina[0];
+
+	Stecca st = new Stecca();
+	Pallina gioc;
+
 	/**
 	 * Launch the application.
 	 * @param args
@@ -40,13 +44,14 @@ public class Tavolo {
 	 */
 	public void open() {
 		Display display = Display.getDefault();
-		//Transform tr = new Transform(display);
+		Transform tr = new Transform(display);
+		Transform trOg = new Transform(display);
 		createContents();
 		shell.open();
 		shell.layout();
 
-		//penna.fillRectangle(100, 100, 50, 150);
-		
+		penna.getTransform(trOg);
+
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 0, 0))));
@@ -65,14 +70,28 @@ public class Tavolo {
 				for (int i = 0; i<p.length; i++) {
 					penna.fillOval(p[i].getX(), p[i].getY(), Pallina.raggio*2, Pallina.raggio*2);
 				}
+
+				penna.fillOval(gioc.getX(), gioc.getY(), Pallina.raggio*2, Pallina.raggio*2);
 				
-				int xx=25*canvas.getBounds().width/100-Pallina.raggio;
+				/*int xx=25*canvas.getBounds().width/100-Pallina.raggio;
 				int yy=canvas.getBounds().height/2;
-				penna.fillOval(xx, yy, Pallina.raggio*2, Pallina.raggio*2);
-				
+				penna.fillOval(xx, yy, Pallina.raggio*2, Pallina.raggio*2);*/
+
+				//stecca
+				penna.getTransform(tr);
+				tr.translate(gioc.getX() + Pallina.raggio, gioc.getY() + Pallina.raggio);
+				tr.rotate(st.getRotazione());
+				penna.setTransform(tr);
+				penna.fillRectangle(Pallina.raggio*2, -5, 60, 5);
+				penna.setTransform(trOg);
+
+				st.setRotazione(st.getRotazione()+1);
+
 				display.sleep();
 			}
 		}
+		tr.dispose();
+		trOg.dispose();
 	}
 
 	/**
@@ -106,7 +125,9 @@ public class Tavolo {
 			}
 			xb += Pallina.raggio*2;
 			yb += Pallina.raggio;
-		}	
+		}
+
+		 gioc = new Pallina(25*canvas.getBounds().width/100-Pallina.raggio, canvas.getBounds().height/2, 0, 0);
 
 	}
 	private void createResourceManager() {
