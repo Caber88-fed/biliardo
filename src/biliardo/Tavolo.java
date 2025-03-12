@@ -4,6 +4,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.JFaceResources;
+
+import java.util.Arrays;
+
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -17,7 +20,8 @@ public class Tavolo {
 	private LocalResourceManager localResourceManager;
 	Canvas canvas;
 	GC penna;
-	Pallina[] p;
+	final int nColonne = 5;
+	Pallina[] p = new Pallina[0];
 	/**
 	 * Launch the application.
 	 * @param args
@@ -58,18 +62,9 @@ public class Tavolo {
 				//palline
 				
 				//p[0]=new Pallina((3/4)*canvas.getBounds().width-Pallina.raggio, canvas.getBounds().height/2, 0, 0);
-				int xb=75*canvas.getBounds().width/100-Pallina.raggio;
-				int yb=canvas.getBounds().height/2;
-				
-				for (int i = 0; i<5; i++) {
-					int yc = yb;
-					for (int ii = 0; ii<i+1; ii++) {
-						penna.fillOval(xb, yc, Pallina.raggio*2, Pallina.raggio*2);
-						yc-=Pallina.raggio*2;
-					}
-					xb += Pallina.raggio*2;
-					yb += Pallina.raggio;
-				}				
+				for (int i = 0; i<p.length; i++) {
+					penna.fillOval(p[i].getX(), p[i].getY(), Pallina.raggio*2, Pallina.raggio*2);
+				}
 				
 				int xx=25*canvas.getBounds().width/100-Pallina.raggio;
 				int yy=canvas.getBounds().height/2;
@@ -97,6 +92,21 @@ public class Tavolo {
 		// width = shellWidth - 16 - bordo*2
 		// height = shellHeight - 39 - bordo*2
 		canvas.setBounds(25, 25, 786, 408);
+		
+		// creazione palline
+		int xb=75*canvas.getBounds().width/100-Pallina.raggio;
+		int yb=canvas.getBounds().height/2;
+		
+		for (int i = 0; i<nColonne; i++) {
+			int yc = yb;
+			for (int ii = 0; ii<i+1; ii++) {
+				p = Arrays.copyOf(p, p.length+1);
+				p[p.length-1] = new Pallina(xb, yc, 0, 0);
+				yc-=Pallina.raggio*2;
+			}
+			xb += Pallina.raggio*2;
+			yb += Pallina.raggio;
+		}	
 
 	}
 	private void createResourceManager() {
