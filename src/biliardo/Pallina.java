@@ -2,7 +2,14 @@ package biliardo;
 
 public class Pallina {
 	private int x, y, colore, direzione;
-
+	
+	
+	
+	public static final int raggio=10;
+	
+	
+	
+	
 	public Pallina(int x, int y, int c, int direzione) {
 		this.x = x;
 		this.y = y;
