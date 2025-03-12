@@ -1,52 +1,50 @@
 package biliardo;
 
 public class Pallina {
-	private int x, y, colore, direzione;
-	
-	
-	
-	public static final int raggio=10;
-	
-	
-	
-	
-	public Pallina(int x, int y, int c, int direzione) {
-		this.x = x;
-		this.y = y;
-		this.colore = c;
-		this.direzione = direzione;
-	}
+    private int x, y, colore, direzione;
+    private static final int raggio = 10;
 
-	public int getDirezione() {
-		return direzione;
-	}
+    public Pallina(int x, int y, int c, int direzione) {
+        this.x = x;
+        this.y = y;
+        this.colore = c;
+        this.direzione = direzione;
+    }
 
-	public void setDirezione(int direzione) {
-		this.direzione = direzione;
-	}
+    public static int getRaggio() {
+        return raggio;
+    }
 
-	public int getX() {
-		return x;
-	}
+    public int getDirezione() {
+        return direzione;
+    }
 
-	public void setX(int x) {
-		this.x = x;
-	}
+    public void setDirezione(int direzione) {
+        this.direzione = direzione;
+    }
 
-	public int getY() {
-		return y;
-	}
+    public int getX() {
+        return x;
+    }
 
-	public void setY(int y) {
-		this.y = y;
-	}
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public int getColore() {
-		return colore;
-	}
+    public int getY() {
+        return y;
+    }
 
-	public void setColore(int colore) {
-		this.colore = colore;
-	}
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getColore() {
+        return colore;
+    }
+
+    public void setColore(int colore) {
+        this.colore = colore;
+    }
 
 }

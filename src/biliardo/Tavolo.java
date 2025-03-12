@@ -66,23 +66,23 @@ public class Tavolo {
 				
 				//palline
 				
-				//p[0]=new Pallina((3/4)*canvas.getBounds().width-Pallina.raggio, canvas.getBounds().height/2, 0, 0);
+				//p[0]=new Pallina((3/4)*canvas.getBounds().width-Pallina.getRaggio(), canvas.getBounds().height/2, 0, 0);
 				for (int i = 0; i<p.length; i++) {
-					penna.fillOval(p[i].getX(), p[i].getY(), Pallina.raggio*2, Pallina.raggio*2);
+					penna.fillOval(p[i].getX(), p[i].getY(), Pallina.getRaggio()*2, Pallina.getRaggio()*2);
 				}
 
-				penna.fillOval(gioc.getX(), gioc.getY(), Pallina.raggio*2, Pallina.raggio*2);
+				penna.fillOval(gioc.getX(), gioc.getY(), Pallina.getRaggio()*2, Pallina.getRaggio()*2);
 				
-				/*int xx=25*canvas.getBounds().width/100-Pallina.raggio;
+				/*int xx=25*canvas.getBounds().width/100-Pallina.getRaggio();
 				int yy=canvas.getBounds().height/2;
-				penna.fillOval(xx, yy, Pallina.raggio*2, Pallina.raggio*2);*/
+				penna.fillOval(xx, yy, Pallina.getRaggio()*2, Pallina.getRaggio()*2);*/
 
 				//stecca
 				penna.getTransform(tr);
-				tr.translate(gioc.getX() + Pallina.raggio, gioc.getY() + Pallina.raggio);
+				tr.translate(gioc.getX() + Pallina.getRaggio(), gioc.getY() + Pallina.getRaggio());
 				tr.rotate(st.getRotazione());
 				penna.setTransform(tr);
-				penna.fillRectangle(Pallina.raggio*2, -5, 60, 5);
+				penna.fillRectangle(Pallina.getRaggio()*2, -5, 60, 5);
 				penna.setTransform(trOg);
 
 				st.setRotazione(st.getRotazione()+1);
@@ -113,7 +113,7 @@ public class Tavolo {
 		canvas.setBounds(25, 25, 786, 408);
 		
 		// creazione palline
-		int xb=75*canvas.getBounds().width/100-Pallina.raggio;
+		int xb=75*canvas.getBounds().width/100-Pallina.getRaggio();
 		int yb=canvas.getBounds().height/2;
 		
 		for (int i = 0; i<nColonne; i++) {
@@ -121,13 +121,13 @@ public class Tavolo {
 			for (int ii = 0; ii<i+1; ii++) {
 				p = Arrays.copyOf(p, p.length+1);
 				p[p.length-1] = new Pallina(xb, yc, 0, 0);
-				yc-=Pallina.raggio*2;
+				yc-=Pallina.getRaggio()*2;
 			}
-			xb += Pallina.raggio*2;
-			yb += Pallina.raggio;
+			xb += Pallina.getRaggio()*2;
+			yb += Pallina.getRaggio();
 		}
 
-		 gioc = new Pallina(25*canvas.getBounds().width/100-Pallina.raggio, canvas.getBounds().height/2, 0, 0);
+		 gioc = new Pallina(25*canvas.getBounds().width/100-Pallina.getRaggio(), canvas.getBounds().height/2, 0, 0);
 
 	}
 	private void createResourceManager() {
