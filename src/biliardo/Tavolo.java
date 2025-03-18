@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseEvent;
 
 public class Tavolo {
 
@@ -80,6 +82,26 @@ public class Tavolo {
         shell.setText("Biliardo");
 
         canvas = new Canvas(shell, SWT.DOUBLE_BUFFERED);
+        canvas.addMouseMoveListener(new MouseMoveListener() {
+        	public void mouseMove(MouseEvent arg0) {
+                int xc = gioc.getX() + Pallina.getRaggio();
+                int yc = gioc.getY() + Pallina.getRaggio();
+                int x0 = xc + Pallina.getRaggio();
+
+                // distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0 gradi))
+                double a = Math.pow(Pallina.getRaggio(),2);
+                // distanza xc,yc (centro) -> xm,ym (punto mouse)
+                double b = Math.pow(arg0.x-xc,2) + Math.pow(arg0.y-yc,2);
+                // distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym (punto mouse)
+                double c = Math.pow(x0-arg0.x,2) + Math.pow(yc-arg0.y,2);
+
+                int angolo = (int)Math.toDegrees((Math.acos(((a+b-c)/Math.sqrt(4*a*b)))));
+                if (arg0.y < yc) {
+                    angolo = -angolo;
+                }
+                st.setRotazione(angolo);
+        	}
+        });
         canvas.addPaintListener(new PaintListener() {
             public void paintControl(PaintEvent arg0) {
                 // buffer
@@ -164,7 +186,7 @@ public class Tavolo {
                 gcImage.fillRectangle(Pallina.getRaggio() * 2, -3, 60, 6);
                 gcImage.setTransform(trOg);
 
-                st.setRotazione(st.getRotazione() + 1);
+                //st.setRotazione(st.getRotazione() + 1);
 
                 arg0.gc.drawImage(image, 0, 0);
 
