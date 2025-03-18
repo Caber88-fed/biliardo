@@ -161,7 +161,7 @@ public class Tavolo {
                 tr.translate(gioc.getX() + Pallina.getRaggio(), gioc.getY() + Pallina.getRaggio());
                 tr.rotate(st.getRotazione());
                 gcImage.setTransform(tr);
-                gcImage.fillRectangle(Pallina.getRaggio() * 2, -5, 60, 5);
+                gcImage.fillRectangle(Pallina.getRaggio() * 2, -3, 60, 6);
                 gcImage.setTransform(trOg);
 
                 st.setRotazione(st.getRotazione() + 1);
