@@ -118,14 +118,13 @@ public class Tavolo {
 					}
 					st.setRotazione(angolo);
 				} else {
-					double b;
-					if (arg0.x < xc || arg0.y < yc) {
-						b = 0;
-					} else {
-						b = Math.pow(arg0.x - xc, 2) + Math.pow(arg0.y - yc, 2);
-					}
-					
-					st.setDistanza((int)Math.sqrt(b));
+					int dX = arg0.x - xc;
+					int dY = arg0.y - yc;
+					//if (dX+dY > 0) {
+						st.setDistanza((int)Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
+					//} else {
+					//	st.setDistanza(0);
+					//}
 				}
 			}
 		});
