@@ -1,14 +1,22 @@
 package biliardo;
 
-public class Pallina {
-    private int x, y, colore, direzione;
-    private static final int raggio = 10;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
-    public Pallina(int x, int y, int c, int direzione) {
+public class Pallina {
+    private int x, y, direzione;
+    private Color colore;
+    private static final int raggio = 10;
+    private boolean bianca;
+
+    public Pallina(int x, int y, Color c, int direzione, boolean bianca) {
         this.x = x;
         this.y = y;
         this.colore = c;
         this.direzione = direzione;
+        this.bianca = bianca;
     }
 
     public static int getRaggio() {
@@ -39,12 +47,20 @@ public class Pallina {
         this.y = y;
     }
 
-    public int getColore() {
+    public Color getColore() {
         return colore;
     }
 
-    public void setColore(int colore) {
+    public void setColore(Color colore) {
         this.colore = colore;
     }
 
+    public void disegna(GC penna) {
+        penna.setBackground(colore);
+        penna.fillOval(x, y, raggio * 2, raggio * 2);
+        if (bianca) {
+            penna.setBackground(new Color(Display.getCurrent(), new RGB(255, 255, 255)));
+            penna.fillOval(x+raggio/2, y+raggio/2, raggio, raggio);
+        }
+    }
 }
