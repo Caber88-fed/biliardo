@@ -158,29 +158,6 @@ public class Tavolo {
                 Transform trOg = new Transform(arg0.gc.getDevice());
                 penna.getTransform(trOg);
 
-                // movimento giocatore
-                double rad = Math.toRadians(gioc.getDirezione());
-                double deltaX = Math.cos(rad) * 5;
-                double deltaY = Math.sin(rad) * 5;
-                int x = (int) (gioc.getX() + deltaX);
-                int y = (int) (gioc.getY() + deltaY);
-
-                // controllo collisioni
-                if (y < 0) {
-                    gioc.setDirezione(-gioc.getDirezione());
-                } else if (y > canvas.getBounds().height - Pallina.getRaggio() * 2) {
-                    gioc.setDirezione(-gioc.getDirezione());
-                }
-
-                if (x < 0) {
-                    gioc.setDirezione(180 - gioc.getDirezione());
-                } else if (x > canvas.getBounds().width - Pallina.getRaggio() * 2) {
-                    gioc.setDirezione(180 - gioc.getDirezione());
-                }
-
-                //gioc.setX(x);
-                //gioc.setY(y);
-
                 penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(0, 0, 0))));
 
                 // SCRITTURA BUCHI
@@ -188,12 +165,15 @@ public class Tavolo {
                     penna.fillOval(b[i].getX(), b[i].getY(), 50, 50);
                 }
 
+
                 // palline
                 for (int i = 0; i < p.length; i++) {
+                    p[i].muovi(canvas.getBounds().height, canvas.getBounds().width);
                     p[i].disegna(penna);
                 }
 
                 // giocatore
+                gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
                 gioc.disegna(penna);
 
                 // PALLINE CHE SCOMPAIONO SE DENTRO BUCA

@@ -6,29 +6,31 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class Pallina {
-    private int x, y, direzione;
+    private int x, y, dir;
     private Color colore;
     private static final int raggio = 10;
     private boolean bianca;
+    private int v;
 
     public Pallina(int x, int y, Color c, int direzione, boolean bianca) {
         this.x = x;
         this.y = y;
         this.colore = c;
-        this.direzione = direzione;
+        this.dir = direzione;
         this.bianca = bianca;
+        v = 10;
     }
 
     public static int getRaggio() {
         return raggio;
     }
 
-    public int getDirezione() {
-        return direzione;
+    public int getDir() {
+        return dir;
     }
 
-    public void setDirezione(int direzione) {
-        this.direzione = direzione;
+    public void setDir(int dir) {
+        this.dir = dir;
     }
 
     public int getX() {
@@ -61,6 +63,24 @@ public class Pallina {
         if (bianca) {
             penna.setBackground(new Color(Display.getCurrent(), new RGB(255, 255, 255)));
             penna.fillOval(x+raggio/2, y+raggio/2, raggio, raggio);
+        }
+    }
+
+    public void muovi(int canvasHeight, int canvasWidth) {
+        // movimento giocatore
+        double rad = Math.toRadians(dir);
+        double deltaX = Math.cos(rad) * v;
+        double deltaY = Math.sin(rad) * v;
+        x += deltaX;
+        y += deltaY;
+
+        // controllo collisioni
+        if (y < 0 || y > canvasHeight - raggio * 2) {
+            dir = -dir;
+        }
+
+        if (x < 0 || x > canvasWidth - raggio * 2) {
+            dir = 180 - dir;
         }
     }
 }
