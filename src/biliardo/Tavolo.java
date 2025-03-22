@@ -126,7 +126,7 @@ public class Tavolo {
             @Override
             public void mouseUp(MouseEvent e) {
                 misuraPot = false;
-                st.setDistanza(0);
+                st.colpisci();
             }
         });
         canvas.addMouseMoveListener(new MouseMoveListener() {
@@ -151,13 +151,11 @@ public class Tavolo {
                     }
                     st.setRotazione(angolo);
                 } else {
+                    double rads = Math.toRadians(st.getRotazione());
                     int dX = arg0.x - xc;
                     int dY = arg0.y - yc;
-                    //if (dX+dY > 0) {
-                    st.setDistanza((int) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
-                    //} else {
-                    //	st.setDistanza(0);
-                    //}
+
+                    st.setDistanza((int)((dX*Math.cos(rads)) + (dY*Math.sin(rads))));
                 }
             }
         });
@@ -176,8 +174,7 @@ public class Tavolo {
                     penna.fillOval(b[i].getX(), b[i].getY(), 50, 50);
                 }
 
-                // stecca
-                st.disegna(penna, trOg);
+
 
                 // palline
                 for (int i = 0; i < p.length; i++) {
@@ -185,8 +182,11 @@ public class Tavolo {
                     p[i].disegna(penna);
                 }
 
+                // stecca
+                st.disegna(penna, trOg);
+
                 // giocatore
-                //gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
+                gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
                 gioc.disegna(penna);
 
                 // PALLINE CHE SCOMPAIONO SE DENTRO BUCA

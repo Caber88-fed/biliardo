@@ -17,6 +17,7 @@ public class Stecca {
 	private boolean anim;
 
 	private Pallina pAssociata;
+	private int push;
 
 	public Stecca(Pallina pAssociata) {
 		rotazione = 0;
@@ -24,6 +25,7 @@ public class Stecca {
 		nascosto = false;
 		anim = false;
 		this.pAssociata = pAssociata;
+		push = 0;
 	}
 
 	public int getRotazione() {
@@ -56,17 +58,26 @@ public class Stecca {
 			penna.fillRectangle(distanza, -(spessore / 2), spessore, spessore);
 			penna.setTransform(trOg);
 			tr.dispose();
+		} else if (pAssociata.getVelocita() == 0) {
+			distanza = dMin;
+			nascosto = false;
 		}
 	}
 	
 	public void colpisci() {
-		if (!anim) anim = true;
+		if (!anim) {
+			anim = true;
+			push = 0;
+		}
 		if (distanza < Pallina.getRaggio()*2) {
 			anim = false;
 			nascosto = true;
+			pAssociata.setVelocita(push*10);
+			pAssociata.setDir(180+rotazione);
 			return;
 		}
 		distanza -= 20;
+		push++;
 	}
 
 	public boolean isAnim() {

@@ -18,7 +18,7 @@ public class Pallina {
         this.colore = c;
         this.dir = direzione;
         this.bianca = bianca;
-        v = 10;
+        v = 0;
     }
 
     public static int getRaggio() {
@@ -82,5 +82,15 @@ public class Pallina {
         if (x < 0 || x > canvasWidth - raggio * 2) {
             dir = 180 - dir;
         }
+
+        v *= 0.92;
+    }
+
+    public void setVelocita(int v) {
+        this.v = v;
+    }
+
+    public int getVelocita() {
+        return v;
     }
 }
