@@ -26,21 +26,20 @@ public class Tavolo {
     // cambia numero colonne palline (rimuovi dopo collisioni)
     private final int nColonne = 5;
 
-    // palline
+    // elementi
     private Pallina[] p = new Pallina[0];
     private Pallina gioc;
-
-    // buche
     private Buca[] b = new Buca[0];
-
-    // stecca
     private Stecca st;
+
+    // transform per stecca
     private Transform trOg;
 
     // cambia modalità stecca
-    boolean misuraPot = false;
+    private boolean misuraPot = false;
 
-    Color[] coloriPalline = {
+    // colori palline
+    private final Color[] coloriPalline = {
             new Color(236, 218, 60), // giallo
             new Color(236, 218, 60), // giallo + bianco
             new Color(16, 122, 174), // blu
@@ -58,11 +57,11 @@ public class Tavolo {
             new Color(137, 132, 173), // viola + bianco
     };
 
-    boolean[] pallineBianche = {false, true, false, false, false, true, true, false, true, false, false, true, true, false, true};
+    // indica se la pallina è bianca
+    private final boolean[] pallineBianche = {false, true, false, false, false, true, true, false, true, false, false, true, true, false, true};
 
     /**
      * Launch the application.
-     *
      * @param args
      */
     public static void main(String[] args) {
@@ -78,22 +77,20 @@ public class Tavolo {
      * Open the window.
      */
     public void open() {
-        final int refreshMS = 5;
         Display display = Display.getDefault();
         createContents();
         shell.open();
         shell.layout();
 
         // Prepara transform per stecca
-        GC pennatemp = new GC(canvas);
-        trOg = new Transform(pennatemp.getDevice());
-        pennatemp.getTransform(trOg);
-        pennatemp.dispose();
+        trOg = new Transform(display);
 
+        // refresh del canvas ogni 5ms
+        // necessario per avere movimento fluido e costante
+        final int refreshMS = 5;
         Runnable runnable = new Runnable() {
             public void run() {
                 canvas.redraw();
-                // canvas.update();
                 display.timerExec(refreshMS, this);
             }
         };
@@ -120,37 +117,45 @@ public class Tavolo {
         canvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
+                // alla pressione del mouse, la stecca si prepara a colpire
                 misuraPot = true;
             }
 
             @Override
             public void mouseUp(MouseEvent e) {
+                // al rilascio del mouse, la stecca colpisce
                 misuraPot = false;
                 st.colpisci();
             }
         });
         canvas.addMouseMoveListener(new MouseMoveListener() {
             public void mouseMove(MouseEvent arg0) {
+                // se la stecca è nascosta o in animazione, non si muove
+                if (st.isAnim() || st.isNascosto()) return;
+
                 int xc = gioc.getX() + Pallina.getRaggio();
                 int yc = gioc.getY() + Pallina.getRaggio();
 
+                // altrimenti controlla la modalità
                 if (!misuraPot) {
+                    // se !misuraPot, la stecca ruota attorno alla pallina
+
                     int x0 = xc + Pallina.getRaggio();
-                    // distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0
-                    // gradi))
+                    // distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0 gradi))
                     double a = Math.pow(Pallina.getRaggio(), 2);
                     // distanza xc,yc (centro) -> xm,ym (punto mouse)
                     double b = Math.pow(arg0.x - xc, 2) + Math.pow(arg0.y - yc, 2);
-                    // distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym
-                    // (punto mouse)
+                    // distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym (punto mouse)
                     double c = Math.pow(x0 - arg0.x, 2) + Math.pow(yc - arg0.y, 2);
 
-                    int angolo = (int) Math.toDegrees((Math.acos(((a + b - c) / Math.sqrt(4 * a * b)))));
+                    double alpha = Math.acos((a + b - c) / (2 * Math.sqrt(a * b)));
+
                     if (arg0.y < yc) {
-                        angolo = -angolo;
+                        alpha = -alpha;
                     }
-                    st.setRotazione(angolo);
+                    st.setRotazione((int) Math.toDegrees(alpha));
                 } else {
+                    // se misuraPot, la stecca si sposta per dare più o meno forza al colpo
                     double rads = Math.toRadians(st.getRotazione());
                     int dX = arg0.x - xc;
                     int dY = arg0.y - yc;
@@ -171,10 +176,8 @@ public class Tavolo {
 
                 // SCRITTURA BUCHI
                 for (int i = 0; i < b.length; i++) {
-                    penna.fillOval(b[i].getX(), b[i].getY(), 50, 50);
+                    b[i].disegna(penna);
                 }
-
-
 
                 // palline
                 for (int i = 0; i < p.length; i++) {
@@ -190,27 +193,24 @@ public class Tavolo {
                 gioc.disegna(penna);
 
                 // PALLINE CHE SCOMPAIONO SE DENTRO BUCA
-                for (int i = 0; i < p.length; i++) {
-                    int c = 0;
-                    while (c < 6) {
-                        if (b[c].Dentro(p[i].getX(), p[i].getY(), 25)) {
-                            p[i] = null;
+                for (int i = 0; i < b.length; i++) {
+                    for (int j = 0; j < p.length; j++) {
+                        if (p[j] != null && b[i].dentro(p[j])) {
+                            p[j] = null;
                         }
-                        c++;
                     }
                 }
-                ///////////////////////////////////////////////////////////
 
                 // PALLINA GIOCATORE CHE RITORNA AL CENTRO SE DENTRO BUCA
-                int c = 0;
-                while (c < 6) {
-                    if (b[c].Dentro(gioc.getX(), gioc.getY(), 25)) {
-                        gioc.setX(25 * canvas.getBounds().width / 100 - Pallina.getRaggio());
-                        gioc.setY(canvas.getBounds().height / 2);
+                for (int i = 0; i < b.length; i++) {
+                    if (b[i].dentro(gioc)) {
+                        gioc.reset();
                     }
-                    c++;
                 }
+
                 ///////////////////////////////////////////////////////////
+
+                penna.drawLine(canvas.getBounds().width/2,0,canvas.getBounds().width/2,canvas.getBounds().height);
 
                 arg0.gc.drawImage(image, 0, 0);
 
@@ -218,15 +218,15 @@ public class Tavolo {
                 penna.dispose();
             }
         });
-        // penna = new GC(canvas);
+
         canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+
         // con bordo = 25
         // width = shellWidth - 16 - bordo*2
         // height = shellHeight - 39 - bordo*2
         canvas.setBounds(25, 25, 786, 408);
 
         // creazione palline
-
         int xb = 75 * canvas.getBounds().width / 100 - Pallina.getRaggio();
         int yb = canvas.getBounds().height / 2;
 
@@ -234,33 +234,31 @@ public class Tavolo {
             int yc = yb;
             for (int ii = 0; ii < i + 1; ii++) {
                 p = Arrays.copyOf(p, p.length + 1);
-                p[p.length - 1] = new Pallina(xb, yc, coloriPalline[p.length - 1], 0, pallineBianche[p.length-1]);
+                p[p.length - 1] = new Pallina(xb, yc, coloriPalline[p.length - 1], pallineBianche[p.length-1]);
                 yc -= Pallina.getRaggio() * 2;
             }
             xb += Pallina.getRaggio() * 2;
             yb += Pallina.getRaggio();
         }
-        gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(), canvas.getBounds().height / 2,
-                new Color(255, 255, 255),
-                70, false);
+
+        gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(),
+                canvas.getBounds().height / 2,
+                localResourceManager.create(ColorDescriptor.createFrom(new Color(255, 255, 255))),
+                false);
 
         st = new Stecca(gioc);
         ///////////////////////////////////////////////////////////
 
-        // CREAZIONE BUCHE
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(-15, -15);
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(canvas.getBounds().width / 2 - 25, -15);
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(canvas.getBounds().width - (50 - 15), -15);
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(-15, canvas.getBounds().height - (50 - 15));
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(canvas.getBounds().width / 2 - 25, canvas.getBounds().height - (50 - 15));
-        b = Arrays.copyOf(b, b.length + 1);
-        b[b.length - 1] = new Buca(canvas.getBounds().width - (50 - 15), canvas.getBounds().height - (50 - 15));
-        ///////////////////////////////////////////////////////////
+        // creazione buche
+        int[] bucaY = {10, canvas.getBounds().height - 10};
+        int[] bucaX = {10, canvas.getBounds().width / 2, canvas.getBounds().width - 10};
+
+        for (int i = 0; i < bucaY.length; i++) {
+            for (int j = 0; j < bucaX.length; j++) {
+                b = Arrays.copyOf(b, b.length + 1);
+                b[b.length - 1] = new Buca(bucaX[j], bucaY[i]);
+            }
+        }
 
     }
 

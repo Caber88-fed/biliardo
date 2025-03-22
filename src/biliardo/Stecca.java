@@ -16,7 +16,7 @@ public class Stecca {
 	private boolean nascosto;
 	private boolean anim;
 
-	private Pallina pAssociata;
+	private final Pallina pAssociata;
 	private int push;
 
 	public Stecca(Pallina pAssociata) {
@@ -34,10 +34,6 @@ public class Stecca {
 
 	public void setRotazione(int rotazione) {
 		this.rotazione = rotazione;
-	}
-
-	public int getDistanza() {
-		return distanza;
 	}
 
 	public void setDistanza(int d) {
@@ -83,6 +79,8 @@ public class Stecca {
 	public boolean isAnim() {
 		return anim;
 	}
-	
-	
+
+	public boolean isNascosto() {
+		return nascosto;
+	}
 }

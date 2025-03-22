@@ -1,32 +1,35 @@
 package biliardo;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class Pallina {
-    private int x, y, dir;
-    private Color colore;
     private static final int raggio = 10;
-    private boolean bianca;
+    private final Color colore;
+    private final boolean bianca;
+    private final int xinit;
+    private final int yinit;
+
+    private int x;
+    private int y;
+    private int dir;
     private int v;
 
-    public Pallina(int x, int y, Color c, int direzione, boolean bianca) {
+    public Pallina(int x, int y, Color c, boolean bianca) {
         this.x = x;
         this.y = y;
         this.colore = c;
-        this.dir = direzione;
         this.bianca = bianca;
-        v = 0;
+        this.dir = 0;
+        this.v = 0;
+        this.xinit = x;
+        this.yinit = y;
     }
 
     public static int getRaggio() {
         return raggio;
-    }
-
-    public int getDir() {
-        return dir;
     }
 
     public void setDir(int dir) {
@@ -37,31 +40,15 @@ public class Pallina {
         return x;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
     public int getY() {
         return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public Color getColore() {
-        return colore;
-    }
-
-    public void setColore(Color colore) {
-        this.colore = colore;
     }
 
     public void disegna(GC penna) {
         penna.setBackground(colore);
         penna.fillOval(x, y, raggio * 2, raggio * 2);
         if (bianca) {
-            penna.setBackground(new Color(Display.getCurrent(), new RGB(255, 255, 255)));
+            penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             penna.fillOval(x+raggio/2, y+raggio/2, raggio, raggio);
         }
     }
@@ -84,6 +71,13 @@ public class Pallina {
         }
 
         v *= 0.92;
+    }
+
+    public void reset() {
+        x = xinit;
+        y = yinit;
+        dir = 0;
+        v = 0;
     }
 
     public void setVelocita(int v) {
