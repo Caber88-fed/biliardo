@@ -1,13 +1,15 @@
 package biliardo;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.widgets.Display;
 
 public class Stecca {
+	private static final Color colore = new Color(199, 171, 130);
 	private final int dMin = Pallina.getRaggio() * 2;
 	private final int dMax = dMin + 100;
-	private final Color colore = new Color(199, 171, 130);
 	private final int spessore = 6; // divisibile per 2
 	private final int lunghezza = 140;
 
@@ -50,7 +52,7 @@ public class Stecca {
 			penna.setTransform(tr);
 			penna.setBackground(colore);
 			penna.fillRectangle(distanza, -(spessore / 2), lunghezza, spessore);
-			penna.setBackground(new Color(255, 255, 255));
+			penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 			penna.fillRectangle(distanza, -(spessore / 2), spessore, spessore);
 			penna.setTransform(trOg);
 			tr.dispose();

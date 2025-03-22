@@ -44,7 +44,7 @@ public class Tavolo {
             new Color(236, 218, 60), // giallo + bianco
             new Color(16, 122, 174), // blu
             new Color(237, 53, 55), // rosso chiaro
-            new Color(0, 0, 0), // nero
+            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK), // nero
             new Color(16, 122, 174), // blu + bianco
             new Color(237, 53, 55), // rosso + bianco
             new Color(179, 57, 62), // rosso scuro
@@ -109,7 +109,8 @@ public class Tavolo {
     protected void createContents() {
         shell = new Shell();
         createResourceManager();
-        shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(128, 64, 0))));
+        // Colore bordo
+        shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(163, 106, 63))));
         shell.setSize(852, 497);
         shell.setText("Biliardo");
 
@@ -172,7 +173,7 @@ public class Tavolo {
                 penna.setBackground(arg0.gc.getBackground());
                 penna.fillRectangle(image.getBounds());
 
-                penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(0, 0, 0))));
+                penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
 
                 // SCRITTURA BUCHI
                 for (int i = 0; i < b.length; i++) {
@@ -210,8 +211,6 @@ public class Tavolo {
 
                 ///////////////////////////////////////////////////////////
 
-                penna.drawLine(canvas.getBounds().width/2,0,canvas.getBounds().width/2,canvas.getBounds().height);
-
                 arg0.gc.drawImage(image, 0, 0);
 
                 image.dispose();
@@ -219,7 +218,8 @@ public class Tavolo {
             }
         });
 
-        canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+        // colore interno
+        canvas.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(87, 143, 54))));
 
         // con bordo = 25
         // width = shellWidth - 16 - bordo*2
@@ -243,7 +243,7 @@ public class Tavolo {
 
         gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(),
                 canvas.getBounds().height / 2,
-                localResourceManager.create(ColorDescriptor.createFrom(new Color(255, 255, 255))),
+                Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
                 false);
 
         st = new Stecca(gioc);

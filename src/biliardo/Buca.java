@@ -8,19 +8,11 @@ public class Buca {
     private final int x;
     private final int y;
     private static final int ragBuca = 25;
-    private static final int ragEffettivo = 18;
+    private static final int ragEffettivo = 16;
 
     public Buca(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-	public static int getRagBuca() {
-        return ragBuca;
-    }
-
-    public static int getRagEffettivo() {
-        return ragEffettivo;
     }
 
     //METODO CHE CONTROLLA SE UNA PALLINA ENTRA IN BUCA
@@ -32,7 +24,8 @@ public class Buca {
     public void disegna(GC penna) {
         penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
         penna.fillOval(x-ragBuca, y-ragBuca, ragBuca*2, ragBuca*2);
-        penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-        penna.fillOval(x-ragEffettivo, y-ragEffettivo, ragEffettivo*2, ragEffettivo*2);
+        // disegna raggio effettivo
+        //penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+        //penna.fillOval(x-ragEffettivo, y-ragEffettivo, ragEffettivo*2, ragEffettivo*2);
     }
 }
