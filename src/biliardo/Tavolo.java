@@ -21,13 +21,23 @@ public class Tavolo {
 
     protected Shell shell;
     private LocalResourceManager localResourceManager;
-    Canvas canvas;
-    // GC penna;
-    final int nColonne = 5;
-    Pallina[] p = new Pallina[0];
-    Buca[] b = new Buca[0];
-    Stecca st = new Stecca();
-    Pallina gioc;
+    private Canvas canvas;
+
+    // cambia numero colonne palline (rimuovi dopo collisioni)
+    private final int nColonne = 5;
+
+    // palline
+    private Pallina[] p = new Pallina[0];
+    private Pallina gioc;
+
+    // buche
+    private Buca[] b = new Buca[0];
+
+    // stecca
+    private Stecca st;
+    private Transform trOg;
+
+    // cambia modalità stecca
     boolean misuraPot = false;
 
     Color[] coloriPalline = {
@@ -73,6 +83,12 @@ public class Tavolo {
         createContents();
         shell.open();
         shell.layout();
+
+        // Prepara transform per stecca
+        GC pennatemp = new GC(canvas);
+        trOg = new Transform(pennatemp.getDevice());
+        pennatemp.getTransform(trOg);
+        pennatemp.dispose();
 
         Runnable runnable = new Runnable() {
             public void run() {
@@ -153,11 +169,6 @@ public class Tavolo {
                 penna.setBackground(arg0.gc.getBackground());
                 penna.fillRectangle(image.getBounds());
 
-                // preparazione rotazione
-                Transform tr = new Transform(arg0.gc.getDevice());
-                Transform trOg = new Transform(arg0.gc.getDevice());
-                penna.getTransform(trOg);
-
                 penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(0, 0, 0))));
 
                 // SCRITTURA BUCHI
@@ -165,15 +176,17 @@ public class Tavolo {
                     penna.fillOval(b[i].getX(), b[i].getY(), 50, 50);
                 }
 
+                // stecca
+                st.disegna(penna, trOg);
 
                 // palline
                 for (int i = 0; i < p.length; i++) {
-                    p[i].muovi(canvas.getBounds().height, canvas.getBounds().width);
+                    //p[i].muovi(canvas.getBounds().height, canvas.getBounds().width);
                     p[i].disegna(penna);
                 }
 
                 // giocatore
-                gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
+                //gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
                 gioc.disegna(penna);
 
                 // PALLINE CHE SCOMPAIONO SE DENTRO BUCA
@@ -199,24 +212,10 @@ public class Tavolo {
                 }
                 ///////////////////////////////////////////////////////////
 
-                // stecca
-                penna.getTransform(tr);
-                tr.translate(gioc.getX() + Pallina.getRaggio(), gioc.getY() + Pallina.getRaggio());
-                tr.rotate(st.getRotazione());
-                penna.setTransform(tr);
-                penna.fillRectangle(st.getDistanza(), -3, 60, 6);
-                penna.setTransform(trOg);
-
-                // st.setRotazione(st.getRotazione() + 1);
-
                 arg0.gc.drawImage(image, 0, 0);
 
                 image.dispose();
                 penna.dispose();
-
-                tr.dispose();
-                trOg.dispose();
-
             }
         });
         // penna = new GC(canvas);
@@ -244,6 +243,8 @@ public class Tavolo {
         gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(), canvas.getBounds().height / 2,
                 new Color(255, 255, 255),
                 70, false);
+
+        st = new Stecca(gioc);
         ///////////////////////////////////////////////////////////
 
         // CREAZIONE BUCHE
