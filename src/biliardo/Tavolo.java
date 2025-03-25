@@ -178,7 +178,7 @@ public class Tavolo {
 
 
 				for (int j = 0; j< p.length; j++) {
-		            p[j].update(canvas.getBounds().width, canvas.getBounds().height, p, j, Pallina.getRaggio());
+					if (p[j] != null) p[j].update(canvas.getBounds().width, canvas.getBounds().height, p, j, Pallina.getRaggio());
 		        }
 
 				penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 0, 0))));
@@ -190,8 +190,9 @@ public class Tavolo {
 
 				// palline
 				for (int i = 0; i < p.length; i++) {
-					p[i].disegna(penna);
-					//penna.fillOval((int)p[i].getX(), (int)p[i].getY(), Pallina.getRaggio() * 2, Pallina.getRaggio() * 2);
+					if (p[i] != null) {
+						p[i].disegna(penna);
+					}
 				}
 
 				// stecca
@@ -205,7 +206,7 @@ public class Tavolo {
 				for (int i = 0; i < b.length; i++) {
 					for (int j = 0; j < p.length; j++) {
 						if (p[j] != null && b[i].dentro(p[j])) {
-							//p[j] = null;
+							p[j] = null;
 						}
 					}
 				}

@@ -14,8 +14,6 @@ public class Pallina {
 
     private int x;
     private int y;
-    private int direzione;
-    private int v;
 
     private double vx;
     private double vy;
@@ -24,13 +22,11 @@ public class Pallina {
         this.x = x;
         this.y = y;
         this.colore = c;
-        this.direzione = 0;
         this.vx = 0;
         this.vy = 0;
         this.bianca = bianca;
         this.xinit = x;
         this.yinit = y;
-        this.v = 0;
     }
 
     public static int getRaggio() {
@@ -63,6 +59,7 @@ public class Pallina {
 
     public void update(int canvasWidth, int canvasHeight, Pallina[] p, int inizio, int r) {
         for (int i = inizio + 1; i < p.length; i++) {
+            if (p[i] != null) {
             Pallina p1 = p[i];
             if (this.distanza(p1) < r + r) {
                 double[] res = {this.vx - p1.vx, this.vy - p1.vy};
@@ -76,9 +73,9 @@ public class Pallina {
                     double[] u2 = rotazione(new double[]{p1.vx, p1.vy}, theta);
 
                     // collisione elastica
-                    double[] v1 = rotazione(new double[]{(u1[0] * (0) + 2 * 1 * u2[0]) / (1 + 1), u1[1]}, -theta);
+                    double[] v1 = rotazione(new double[]{(u1[0] * (1-1) + 2 * 1 * u2[0]) / (1 + 1), u1[1]}, -theta);
 
-                    double[] v2 = rotazione(new double[]{(u2[0] * (0) + 2 * 1 * u1[0]) / (1 + 1), u2[1]}, -theta);
+                    double[] v2 = rotazione(new double[]{(u2[0] * (1-1) + 2 * 1 * u1[0]) / (1 + 1), u2[1]}, -theta);
 
                     // Aggiorna le velocità
                     this.vx = v1[0];
@@ -88,28 +85,29 @@ public class Pallina {
                 }
             }
         }
+        }
 
         //collisioni con i bordi del canvas
-        if (this.x - r <= 0) {
-            this.x = r;
+        if (this.x + this.vx <= 0) {
+            this.x = 0;
             this.vx = -this.vx;
         }
-        if (this.x + r >= canvasWidth) {
-            this.x = canvasWidth - r;
+        if (this.x + this.vx >= canvasWidth- r*2) {
+            this.x = canvasWidth - r*2;
             this.vx = -this.vx;
         }
-        if (this.y - r <= 0) {
-            this.y = r;
+        if (this.y + this.vy <= 0) {
+            this.y = 0;
             this.vy = -this.vy;
         }
-        if (this.y + r >= canvasHeight) {
-            this.y = canvasHeight - r;
+        if (this.y + this.vy  >= canvasHeight-r*2) {
+            this.y = canvasHeight - r*2;
             this.vy = -this.vy;
         }
 
         //Aggiornamento della posizione
-        this.x += this.vx;
-        this.y += this.vy;
+        this.x += Math.round(this.vx);
+        this.y += Math.round(this.vy);
         this.vx /= 1.05;
         this.vy /= 1.05;
         if (Math.abs(this.vx) < 0.1) this.vx = 0;
@@ -119,8 +117,6 @@ public class Pallina {
     public void reset() {
         x = xinit;
         y = yinit;
-        v = 0;
-        direzione = 0;
         vx = 0;
         vy = 0;
     }
@@ -134,49 +130,8 @@ public class Pallina {
         }
     }
 
-    public void muovi(int canvasHeight, int canvasWidth) {
-        // movimento giocatore
-        double rad = Math.toRadians(direzione);
-        double deltaX = Math.cos(rad) * v;
-        double deltaY = Math.sin(rad) * v;
-        x += deltaX;
-        y += deltaY;
-
-        // controllo collisioni
-        if (y < 0 || y > canvasHeight - raggio * 2) {
-            direzione = -direzione;
-        }
-
-        if (x < 0 || x > canvasWidth - raggio * 2) {
-            direzione = 180 - direzione;
-        }
-
-        v *= 0.92;
-    }
-
-
-    public void setVelocita(int v) {
-        this.v = v;
-    }
-
-    public int getVelocita() {
-        return v;
-    }
-
-    public void setDir(int dir) {
-        this.direzione = dir;
-    }
-
-    public double getVx() {
-        return vx;
-    }
-
     public void setVx(double vx) {
         this.vx = vx;
-    }
-
-    public double getVy() {
-        return vy;
     }
 
     public void setVy(double vy) {
