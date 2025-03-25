@@ -31,9 +31,9 @@ public class Buca {
 	
 	
 	//METODO CHE CONTROLLA SE UNA PALLINA ENTRA IN BUCA
-	public boolean Dentro(int a, int b, int r) {
-		int x1=this.getX()+25;
-		int y1=this.getY()+25;
+	public boolean Dentro(double a, double b, double r) {
+		double x1=this.getX()+25;
+		double y1=this.getY()+25;
 		double distanza=(double)Math.sqrt(Math.pow(a-x1, 2) + Math.pow(b-y1, 2));
 		if(distanza<this.getRc() + r) {
 			return true;
