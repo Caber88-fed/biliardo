@@ -70,8 +70,8 @@ public class Stecca {
         if (distanza < Pallina.getRaggio()*2) {
             anim = false;
             nascosto = true;
-            pAssociata.setVelocita(push*10);
-            pAssociata.setDir(180+rotazione);
+            pAssociata.setVx(Math.cos(Math.toRadians(180+rotazione))*(push*10));
+            pAssociata.setVy(Math.sin(Math.toRadians(180+rotazione))*(push*10));
             return;
         }
         distanza -= 20;

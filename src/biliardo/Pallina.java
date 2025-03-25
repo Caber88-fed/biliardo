@@ -25,15 +25,15 @@ public class Pallina {
         this.y = y;
         this.colore = c;
         this.direzione = 0;
-        this.vx=10;
-        this.vy=10;
+        this.vx = 0;
+        this.vy = 0;
         this.bianca = bianca;
         this.xinit = x;
         this.yinit = y;
         this.v = 0;
     }
 
-	public static int getRaggio() {
+    public static int getRaggio() {
         return raggio;
     }
 
@@ -50,24 +50,24 @@ public class Pallina {
         double dy = this.y - p.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
-    
-	//Rotazione vettore velocità
-	 private double[] rotazione(double[] velocita, double theta) {
-	        double cosTheta = Math.cos(theta);
-	        double sinTheta = Math.sin(theta);
-	        return new double[]{
-	        	velocita[0] * cosTheta - velocita[1] * sinTheta,
-	            velocita[0] * sinTheta + velocita[1] * cosTheta
-	        };
-	    }
 
-	public void update(int canvasWidth, int canvasHeight, Pallina[] p, int inizio, int r) {
+    //Rotazione vettore velocità
+    private double[] rotazione(double[] velocita, double theta) {
+        double cosTheta = Math.cos(theta);
+        double sinTheta = Math.sin(theta);
+        return new double[]{
+                velocita[0] * cosTheta - velocita[1] * sinTheta,
+                velocita[0] * sinTheta + velocita[1] * cosTheta
+        };
+    }
+
+    public void update(int canvasWidth, int canvasHeight, Pallina[] p, int inizio, int r) {
         for (int i = inizio + 1; i < p.length; i++) {
-            Pallina p1= p[i];
+            Pallina p1 = p[i];
             if (this.distanza(p1) < r + r) {
                 double[] res = {this.vx - p1.vx, this.vy - p1.vy};
                 if (res[0] * (p1.x - this.x) + res[1] * (p1.y - this.y) >= 0) {
-                    
+
                     // angolo di collisione
                     double theta = -Math.atan2(p1.y - this.y, p1.x - this.x);
 
@@ -76,9 +76,9 @@ public class Pallina {
                     double[] u2 = rotazione(new double[]{p1.vx, p1.vy}, theta);
 
                     // collisione elastica
-                    double[] v1 = rotazione(new double[]{(u1[0] * (1 - 1) + 2 * 1 * u2[0]) / (1 + 1),u1[1]}, -theta);
+                    double[] v1 = rotazione(new double[]{(u1[0] * (0) + 2 * 1 * u2[0]) / (1 + 1), u1[1]}, -theta);
 
-                    double[] v2 = rotazione(new double[]{(u2[0] * (1 - 1) + 2 * 1 * u1[0]) / (1 + 1),u2[1]}, -theta);
+                    double[] v2 = rotazione(new double[]{(u2[0] * (0) + 2 * 1 * u1[0]) / (1 + 1), u2[1]}, -theta);
 
                     // Aggiorna le velocità
                     this.vx = v1[0];
@@ -88,8 +88,7 @@ public class Pallina {
                 }
             }
         }
-    
-	
+
         //collisioni con i bordi del canvas
         if (this.x - r <= 0) {
             this.x = r;
@@ -111,11 +110,16 @@ public class Pallina {
         //Aggiornamento della posizione
         this.x += this.vx;
         this.y += this.vy;
-	}
+        this.vx /= 1.05;
+        this.vy /= 1.05;
+        if (Math.abs(this.vx) < 0.1) this.vx = 0;
+        if (Math.abs(this.vy) < 0.1) this.vy = 0;
+    }
 
     public void reset() {
         x = xinit;
         y = yinit;
+        v = 0;
         direzione = 0;
         vx = 0;
         vy = 0;
@@ -126,7 +130,7 @@ public class Pallina {
         penna.fillOval(x, y, raggio * 2, raggio * 2);
         if (bianca) {
             penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            penna.fillOval(x+raggio/2, y+raggio/2, raggio, raggio);
+            penna.fillOval(x + raggio / 2, y + raggio / 2, raggio, raggio);
         }
     }
 
@@ -163,4 +167,19 @@ public class Pallina {
         this.direzione = dir;
     }
 
+    public double getVx() {
+        return vx;
+    }
+
+    public void setVx(double vx) {
+        this.vx = vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public void setVy(double vy) {
+        this.vy = vy;
+    }
 }

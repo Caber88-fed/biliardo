@@ -198,7 +198,7 @@ public class Tavolo {
 				st.disegna(penna, trOg);
 
 				// giocatore
-				gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
+				gioc.update(canvas.getBounds().width,canvas.getBounds().height, p, -1, Pallina.getRaggio());
 				gioc.disegna(penna);
 
 				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
