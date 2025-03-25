@@ -1,105 +1,55 @@
 package biliardo;
 
-import java.util.Arrays;
-
-
-
-
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.widgets.Display;
 
 public class Pallina {
-    private double x, y, direzione;
     private static final int raggio = 10;
-    private int colore;
+    private final Color colore;
+    private final boolean bianca;
+    private final int xinit;
+    private final int yinit;
+
+    private int x;
+    private int y;
+    private int direzione;
+    private int v;
+
     private double vx;
     private double vy;
-    
 
-    public Pallina(double x, double y, int c, double direzione, double vx, double vy) {
+    public Pallina(int x, int y, Color c, boolean bianca) {
         this.x = x;
         this.y = y;
         this.colore = c;
-        this.direzione = direzione;
-        this.vx=vx;
-        this.vy=vy;
+        this.direzione = 0;
+        this.vx=10;
+        this.vy=10;
+        this.bianca = bianca;
+        this.xinit = x;
+        this.yinit = y;
+        this.v = 0;
     }
 
 	public static int getRaggio() {
         return raggio;
     }
 
-    public double getDirezione() {
-        return direzione;
-    }
-
-    public void setDirezione(double direzione) {
-        this.direzione = direzione;
-    }
-
-    public double getX() {
+    public int getX() {
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
+    public int getY() {
         return y;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getColore() {
-        return colore;
-    }
-
-    public void setColore(int colore) {
-        this.colore = colore;
-    }
-
-    
-    public void aggiornaPosizione() {
-    	this.x+=this.vx;
-    	this.y+=this.vy;
-    }
-    
-    
     public double distanza(Pallina p) {
         double dx = this.x - p.x;
         double dy = this.y - p.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
-    
-    
-  //Restituisce l'angolo tra le velocità y e x in radianti
-    public double getRadAngle()
-    {
-        return Math.atan2(vy, vx);
-    }
-                
-    //restituisce la velocità della palla corrente in pixel per iterazione
-    public double getVelocity()
-    {
-        return Math.sqrt(vx*vx + vy*vy);
-    }
-    
-    public double getVx() {
-		return vx;
-	}
-
-	public void setVx(int vx) {
-		this.vx = vx;
-	}
-
-	public double getVy() {
-		return vy;
-	}
-
-	public void setVy(int vy) {
-		this.vy = vy;
-	}
     
 	//Rotazione vettore velocità
 	 private double[] rotazione(double[] velocita, double theta) {
@@ -110,8 +60,7 @@ public class Pallina {
 	            velocita[0] * sinTheta + velocita[1] * cosTheta
 	        };
 	    }
-	
-	
+
 	public void update(int canvasWidth, int canvasHeight, Pallina[] p, int inizio, int r) {
         for (int i = inizio + 1; i < p.length; i++) {
             Pallina p1= p[i];
@@ -163,4 +112,55 @@ public class Pallina {
         this.x += this.vx;
         this.y += this.vy;
 	}
+
+    public void reset() {
+        x = xinit;
+        y = yinit;
+        direzione = 0;
+        vx = 0;
+        vy = 0;
+    }
+
+    public void disegna(GC penna) {
+        penna.setBackground(colore);
+        penna.fillOval(x, y, raggio * 2, raggio * 2);
+        if (bianca) {
+            penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            penna.fillOval(x+raggio/2, y+raggio/2, raggio, raggio);
+        }
+    }
+
+    public void muovi(int canvasHeight, int canvasWidth) {
+        // movimento giocatore
+        double rad = Math.toRadians(direzione);
+        double deltaX = Math.cos(rad) * v;
+        double deltaY = Math.sin(rad) * v;
+        x += deltaX;
+        y += deltaY;
+
+        // controllo collisioni
+        if (y < 0 || y > canvasHeight - raggio * 2) {
+            direzione = -direzione;
+        }
+
+        if (x < 0 || x > canvasWidth - raggio * 2) {
+            direzione = 180 - direzione;
+        }
+
+        v *= 0.92;
+    }
+
+
+    public void setVelocita(int v) {
+        this.v = v;
+    }
+
+    public int getVelocita() {
+        return v;
+    }
+
+    public void setDir(int dir) {
+        this.direzione = dir;
+    }
+
 }

@@ -1,46 +1,31 @@
 package biliardo;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.widgets.Display;
+
 public class Buca {
-	private int x;
-	private int y;
-	public static final int raggio=25;
-	private static final int rc=18;
-	public Buca(int x, int y) {
-		super();
-		this.x = x;
-		this.y = y;
-	}
-	public int getX() {
-		return x;
-	}
-	public void setX(int x) {
-		this.x = x;
-	}
-	public int getY() {
-		return y;
-	}
-	public void setY(int y) {
-		this.y = y;
-	}
-	public int getRc() {
-		return rc;
-	}
-	public static int getRaggio() {
-		return raggio;
-	}
-	
-	
-	//METODO CHE CONTROLLA SE UNA PALLINA ENTRA IN BUCA
-	public boolean Dentro(double a, double b, double r) {
-		double x1=this.getX()+25;
-		double y1=this.getY()+25;
-		double distanza=(double)Math.sqrt(Math.pow(a-x1, 2) + Math.pow(b-y1, 2));
-		if(distanza<this.getRc() + r) {
-			return true;
-		}
-		return false;
-		
-	}
-	
-	
+    private final int x;
+    private final int y;
+    private static final int ragBuca = 25;
+    private static final int ragEffettivo = 16;
+
+    public Buca(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    //METODO CHE CONTROLLA SE UNA PALLINA ENTRA IN BUCA
+    public boolean dentro(Pallina p) {
+        double dist = Math.sqrt(Math.pow(x - (p.getX()+Pallina.getRaggio()), 2) + Math.pow(y - (p.getY()+Pallina.getRaggio()), 2));
+        return dist <= ragEffettivo+Pallina.getRaggio();
+    }
+
+    public void disegna(GC penna) {
+        penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+        penna.fillOval(x-ragBuca, y-ragBuca, ragBuca*2, ragBuca*2);
+        // disegna raggio effettivo
+        //penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+        //penna.fillOval(x-ragEffettivo, y-ragEffettivo, ragEffettivo*2, ragEffettivo*2);
+    }
 }

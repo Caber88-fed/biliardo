@@ -1,6 +1,6 @@
 package biliardo;
 
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -10,9 +10,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
 import org.eclipse.jface.resource.ColorDescriptor;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintListener;
@@ -25,14 +22,45 @@ public class Tavolo {
 
 	protected Shell shell;
 	private LocalResourceManager localResourceManager;
-	Canvas canvas;
-	// GC penna;
-	int nColonne=5;
-	Pallina[] p = new Pallina[0];
-	Buca[] b = new Buca[0];
-	Stecca st = new Stecca();
-	Pallina gioc;
-	boolean misuraPot = false;
+	private Canvas canvas;
+
+	// cambia numero colonne palline (rimuovi dopo collisioni)
+	private final int nColonne = 5;
+
+	// elementi
+	private Pallina[] p = new Pallina[0];
+	private Pallina gioc;
+	private Buca[] b = new Buca[0];
+	private Stecca st;
+
+	// transform per stecca
+	private Transform trOg;
+
+	// cambia modalità stecca
+	private boolean misuraPot = false;
+
+	// colori palline
+	private final Color[] coloriPalline = {
+			new Color(236, 218, 60), // giallo
+			new Color(236, 218, 60), // giallo + bianco
+			new Color(16, 122, 174), // blu
+			new Color(237, 53, 55), // rosso chiaro
+			new Color(0, 0, 0), // nero
+			new Color(16, 122, 174), // blu + bianco
+			new Color(237, 53, 55), // rosso + bianco
+			new Color(179, 57, 62), // rosso scuro
+			new Color(50, 134, 82), // verde + bianco
+			new Color(137, 132, 173), // viola
+			new Color(244, 133, 51), // arancione
+			new Color(244, 133, 51), // arancione + bianco
+			new Color(179, 57, 62), // rosso scuro + bianco
+			new Color(50, 134, 82), // verde
+			new Color(137, 132, 173), // viola + bianco
+	};
+
+	// indica se la pallina è bianca
+	private final boolean[] pallineBianche = {false, true, false, false, false, true, true, false, true, false, false, true, true, false, true};
+
 
 	/**
 	 * Launch the application.
@@ -52,16 +80,20 @@ public class Tavolo {
 	 * Open the window.
 	 */
 	public void open() {
-		final int refreshMS = 5;
 		Display display = Display.getDefault();
 		createContents();
 		shell.open();
 		shell.layout();
 
+		// Prepara transform per stecca
+		trOg = new Transform(display);
+
+		// refresh del canvas ogni 5ms
+		// necessario per avere movimento fluido e costante
+		final int refreshMS = 5;
 		Runnable runnable = new Runnable() {
 			public void run() {
 				canvas.redraw();
-				// canvas.update();
 				display.timerExec(refreshMS, this);
 			}
 		};
@@ -80,7 +112,8 @@ public class Tavolo {
 	protected void createContents() {
 		shell = new Shell();
 		createResourceManager();
-		shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(128, 64, 0))));
+		// Colore bordo
+		shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(163, 106, 63))));
 		shell.setSize(852, 497);
 		shell.setText("Biliardo");
 
@@ -88,44 +121,50 @@ public class Tavolo {
 		canvas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
+				// alla pressione del mouse, la stecca si prepara a colpire
 				misuraPot = true;
 			}
 
 			@Override
 			public void mouseUp(MouseEvent e) {
+				// al rilascio del mouse, la stecca colpisce
 				misuraPot = false;
-				st.setDistanza(0);
+				st.colpisci();
 			}
 		});
 		canvas.addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(MouseEvent arg0) {
-				double xc = gioc.getX() + Pallina.getRaggio();
-				double yc = gioc.getY() + Pallina.getRaggio();
+				// se la stecca è nascosta o in animazione, non si muove
+				if (st.isAnim() || st.isNascosto()) return;
 
+				int xc = gioc.getX() + Pallina.getRaggio();
+				int yc = gioc.getY() + Pallina.getRaggio();
+
+				// altrimenti controlla la modalità
 				if (!misuraPot) {
-					double x0 = xc + Pallina.getRaggio();
-					// distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0
-					// gradi))
+					// se !misuraPot, la stecca ruota attorno alla pallina
+
+					int x0 = xc + Pallina.getRaggio();
+					// distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0 gradi))
 					double a = Math.pow(Pallina.getRaggio(), 2);
 					// distanza xc,yc (centro) -> xm,ym (punto mouse)
 					double b = Math.pow(arg0.x - xc, 2) + Math.pow(arg0.y - yc, 2);
-					// distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym
-					// (punto mouse)
+					// distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym (punto mouse)
 					double c = Math.pow(x0 - arg0.x, 2) + Math.pow(yc - arg0.y, 2);
 
-					int angolo = (int) Math.toDegrees((Math.acos(((a + b - c) / Math.sqrt(4 * a * b)))));
+					double alpha = Math.acos((a + b - c) / (2 * Math.sqrt(a * b)));
+
 					if (arg0.y < yc) {
-						angolo = -angolo;
+						alpha = -alpha;
 					}
-					st.setRotazione(angolo);
+					st.setRotazione((int) Math.toDegrees(alpha));
 				} else {
-					double dX = arg0.x - xc;
-					double dY = arg0.y - yc;
-					//if (dX+dY > 0) {
-						st.setDistanza((int)Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
-					//} else {
-					//	st.setDistanza(0);
-					//}
+					// se misuraPot, la stecca si sposta per dare più o meno forza al colpo
+					double rads = Math.toRadians(st.getRotazione());
+					int dX = arg0.x - xc;
+					int dY = arg0.y - yc;
+
+					st.setDistanza((int)((dX*Math.cos(rads)) + (dY*Math.sin(rads))));
 				}
 			}
 		});
@@ -133,138 +172,64 @@ public class Tavolo {
 			public void paintControl(PaintEvent arg0) {
 				// buffer
 				Image image = new Image(shell.getDisplay(), canvas.getBounds());
-				GC gcImage = new GC(image);
-				gcImage.setBackground(arg0.gc.getBackground());
-				gcImage.fillRectangle(image.getBounds());
+				GC penna = new GC(image);
+				penna.setBackground(arg0.gc.getBackground());
+				penna.fillRectangle(image.getBounds());
 
-				// preparazione rotazione
-				Transform tr = new Transform(arg0.gc.getDevice());
-				Transform trOg = new Transform(arg0.gc.getDevice());
-				gcImage.getTransform(trOg);
 
-				// movimento giocatore
-				double rad = Math.toRadians(gioc.getDirezione());
-				double deltaX = Math.cos(rad) * 5;
-				double deltaY = Math.sin(rad) * 5;
-				int x = (int) (gioc.getX() + deltaX);
-				int y = (int) (gioc.getY() + deltaY);
-				
-			
-				// controllo collisioni
-				if (y < 0) {
-					gioc.setDirezione(-gioc.getDirezione());
-				} else if (y > canvas.getBounds().height - Pallina.getRaggio() * 2) {
-					gioc.setDirezione(-gioc.getDirezione());
-				}
-
-				if (x < 0) {
-					gioc.setDirezione(180 - gioc.getDirezione());
-				} else if (x > canvas.getBounds().width - Pallina.getRaggio() * 2) {
-					gioc.setDirezione(180 - gioc.getDirezione());
-				}
-				
-				//gioc.setX(x);
-				//gioc.setY(y);
-				
-				
-				/*for(int i=0;i<p.length;i++) {
-					 rad = Math.toRadians(p[i].getDirezione());
-					 deltaX = Math.cos(rad) * 5;
-					 deltaY = Math.sin(rad) * 5;
-					 x = (int) (p[i].getX() + deltaX);
-					 y = (int) (p[i].getY() + deltaY);
-					if (y < 0) {
-						p[i].setDirezione(-p[i].getDirezione());
-					} else if (y > canvas.getBounds().height - Pallina.getRaggio() * 2) {
-						p[i].setDirezione(-p[i].getDirezione());
-					}
-
-					if (x < 0) {
-						p[i].setDirezione(180 - p[i].getDirezione());
-					} else if (x > canvas.getBounds().width - Pallina.getRaggio() * 2) {
-						p[i].setDirezione(180 - p[i].getDirezione());
-					}
-					 
-					 
-					 
-					
-					p[i].setX(x);
-					p[i].setY(y);
-				}*/
 				for (int j = 0; j< p.length; j++) {
 		            p[j].update(canvas.getBounds().width, canvas.getBounds().height, p, j, Pallina.getRaggio());
 		        }
 
-				/*if (p[0].collisione(p[1])) {
-					Pallina pippo=new Pallina(p[0].getX(),p[0].getY(),p[0].getColore(),p[0].getDirezione(),p[0].getVx(),p[0].getVy(),p[0].getVelocita());
-					p[0].variazioneCollisione(p[1]);
-					p[0].setDirezione((int)Math.toDegrees(Math.atan2(p[0].getVx(), p[0].getVy())));
-					
-					p[1].variazioneCollisione(pippo);
-					p[1].setDirezione((int)Math.toDegrees(Math.atan2(p[1].getVx(), p[1].getVy())));
-				}*/
-
-
-				gcImage.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 0, 0))));
+				penna.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 0, 0))));
 
 				// SCRITTURA BUCHI
 				for (int i = 0; i < b.length; i++) {
-					gcImage.fillOval(b[i].getX(), b[i].getY(), 50, 50);
+					b[i].disegna(penna);
 				}
 
 				// palline
 				for (int i = 0; i < p.length; i++) {
-					gcImage.fillOval((int)p[i].getX(), (int)p[i].getY(), Pallina.getRaggio() * 2, Pallina.getRaggio() * 2);
+					p[i].disegna(penna);
+					//penna.fillOval((int)p[i].getX(), (int)p[i].getY(), Pallina.getRaggio() * 2, Pallina.getRaggio() * 2);
 				}
 
+				// stecca
+				st.disegna(penna, trOg);
+
 				// giocatore
-				gcImage.fillOval((int)gioc.getX(), (int)gioc.getY(), Pallina.getRaggio() * 2, Pallina.getRaggio() * 2);
+				gioc.muovi(canvas.getBounds().height, canvas.getBounds().width);
+				gioc.disegna(penna);
 
 				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
-				for (int i = 0; i < p.length; i++) {
-					int c = 0;
-					while (c < 6) {
-						if (b[c].Dentro(p[i].getX(), p[i].getY(), 25)) {
-							//p[i] = null;
+				for (int i = 0; i < b.length; i++) {
+					for (int j = 0; j < p.length; j++) {
+						if (p[j] != null && b[i].dentro(p[j])) {
+							//p[j] = null;
 						}
-						c++;
 					}
 				}
 				///////////////////////////////////////////////////////////
 
 				// PALLINA GIOCATORE CHE RITORNA AL CENTRO SE DENTRO BUCA
-				int c = 0;
-				while (c < 6) {
-					if (b[c].Dentro(gioc.getX(), gioc.getY(), 25)) {
-						gioc.setX(25 * canvas.getBounds().width / 100 - Pallina.getRaggio());
-						gioc.setY(canvas.getBounds().height / 2);
+				for (int i = 0; i < b.length; i++) {
+					if (b[i].dentro(gioc)) {
+						gioc.reset();
 					}
-					c++;
 				}
 				///////////////////////////////////////////////////////////
 
-				// stecca
-				gcImage.getTransform(tr);
-				tr.translate((float)gioc.getX() + Pallina.getRaggio(), (float)gioc.getY() + Pallina.getRaggio());
-				tr.rotate(st.getRotazione());
-				gcImage.setTransform(tr);
-				gcImage.fillRectangle(st.getDistanza(), -3, 60, 6);
-				gcImage.setTransform(trOg);
-
-				// st.setRotazione(st.getRotazione() + 1);
 
 				arg0.gc.drawImage(image, 0, 0);
 
 				image.dispose();
-				gcImage.dispose();
-
-				tr.dispose();
-				trOg.dispose();
+				penna.dispose();
 
 			}
 		});
-		// penna = new GC(canvas);
-		canvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
+		// colore interno
+		canvas.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(87, 143, 54))));
+
 		// con bordo = 25
 		// width = shellWidth - 16 - bordo*2
 		// height = shellHeight - 39 - bordo*2
@@ -278,37 +243,33 @@ public class Tavolo {
 			int yc = yb;
 			for (int ii = 0; ii < i + 1; ii++) {
 				p = Arrays.copyOf(p, p.length + 1);
-				p[p.length - 1] = new Pallina(xb, yc, 0, 40,10,10);
+				p[p.length - 1] = new Pallina(xb, yc, coloriPalline[p.length - 1], pallineBianche[p.length-1]);
 				yc -= Pallina.getRaggio() * 2;
 			}
 			xb += Pallina.getRaggio() * 2;
 			yb += Pallina.getRaggio();
 		}
-		gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(), canvas.getBounds().height / 2, 0,
-				70,0,0);
+		gioc = new Pallina(25 * canvas.getBounds().width / 100 - Pallina.getRaggio(),
+				canvas.getBounds().height / 2,
+				Display.getCurrent().getSystemColor(SWT.COLOR_WHITE),
+				false);
+
+		st = new Stecca(gioc);
 		///////////////////////////////////////////////////////////
 
-		// CREAZIONE BUCHE
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(-15, -15);
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(canvas.getBounds().width / 2 - 25, -15);
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(canvas.getBounds().width - (50 - 15), -15);
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(-15, canvas.getBounds().height - (50 - 15));
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(canvas.getBounds().width / 2 - 25, canvas.getBounds().height - (50 - 15));
-		b = Arrays.copyOf(b, b.length + 1);
-		b[b.length - 1] = new Buca(canvas.getBounds().width - (50 - 15), canvas.getBounds().height - (50 - 15));
+		// creazione buche
+		int[] bucaY = {10, canvas.getBounds().height - 10};
+		int[] bucaX = {10, canvas.getBounds().width / 2, canvas.getBounds().width - 10};
+
+		for (int i = 0; i < bucaY.length; i++) {
+			for (int j = 0; j < bucaX.length; j++) {
+				b = Arrays.copyOf(b, b.length + 1);
+				b[b.length - 1] = new Buca(bucaX[j], bucaY[i]);
+			}
+		}
 		///////////////////////////////////////////////////////////
 
 	}
-	/*public void actionPerformed(ActionEvent e) {
-        // Aggiorna tutte le particelle
-        
-        //repaint(); // Ridisegna il canvas
-    }*/
 
 	private void createResourceManager() {
 		localResourceManager = new LocalResourceManager(JFaceResources.getResources(), shell);
