@@ -44,7 +44,7 @@ public class Tavolo {
             new Color(236, 218, 60), // giallo + bianco
             new Color(16, 122, 174), // blu
             new Color(237, 53, 55), // rosso chiaro
-            Display.getCurrent().getSystemColor(SWT.COLOR_BLACK), // nero
+            new Color(0, 0, 0), // nero
             new Color(16, 122, 174), // blu + bianco
             new Color(237, 53, 55), // rosso + bianco
             new Color(179, 57, 62), // rosso scuro
