@@ -8,37 +8,35 @@ import org.eclipse.swt.widgets.Display;
 public class Pallina {
     private static final int raggio = 10;
     private final Color colore;
-    private final boolean bianca;
     private final int xinit;
     private final int yinit;
-    public static String tipo;
+    private int tipo;
     private int x;
     private int y;
 
     private double vx;
     private double vy;
 
-    private boolean nascosto = false;
+    private boolean nascosto;
 
-    public Pallina(int x, int y, Color c, boolean bianca, String tipo) {
+    public Pallina(int x, int y, Color c, int tipo) {
         this.x = x;
         this.y = y;
         this.colore = c;
         this.vx = 0;
         this.vy = 0;
-        this.bianca = bianca;
         this.xinit = x;
         this.yinit = y;
-        this.tipo=tipo;
+        this.tipo = tipo;
         this.nascosto = false;
     }
 
-    public static String getTipo() {
+    public int getTipo() {
 		return tipo;
 	}
 
-	public static void setTipo(String tipo) {
-		Pallina.tipo = tipo;
+	public void setTipo(int tipo) {
+		this.tipo = tipo;
 	}
 
 	public static int getRaggio() {
@@ -137,7 +135,7 @@ public class Pallina {
         if (this.nascosto) return;
         penna.setBackground(colore);
         penna.fillOval(x, y, raggio * 2, raggio * 2);
-        if (bianca) {
+        if (tipo == 1) {
             penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             penna.fillOval(x + raggio / 2, y + raggio / 2, raggio, raggio);
         }

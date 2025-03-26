@@ -69,8 +69,8 @@ public class Principale {
 				Tavolo c =new Tavolo();
 				shell.setVisible(false);
 				c.open();
-				
-				
+
+
 			}
 		});
 		btnApriTavolo.setBounds(504, 276, 134, 25);
@@ -102,7 +102,7 @@ public class Principale {
 						+ "\r\n"
 						+ "Buon divertimento! 🎱", "REGOLAMENTO",1);
 
-				
+
 			}
 		});
 		btnNewButton_1.setBounds(245, 276, 139, 25);
@@ -129,12 +129,12 @@ public class Principale {
 		lblBiliardo.setFont(localResourceManager.create(FontDescriptor.createFrom("Segoe UI Black", 50, SWT.BOLD | SWT.ITALIC)));
 		lblBiliardo.setBounds(216, 52, 503, 124);
 		lblBiliardo.setText("BILIARDO");
-		
+
 		Label lblDavideGasparetto = new Label(shell, SWT.NONE);
 		lblDavideGasparetto.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 255, 0))));
 		lblDavideGasparetto.setBounds(51, 409, 151, 25);
 		lblDavideGasparetto.setText("Davide Gasparetto");
-		
+
 		Label lblCaberlottoFrancesco = new Label(shell, SWT.NONE);
 		lblCaberlottoFrancesco.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(0, 255, 0))));
 		lblCaberlottoFrancesco.setBounds(50, 440, 175, 25);
