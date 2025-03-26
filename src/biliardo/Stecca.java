@@ -56,12 +56,12 @@ public class Stecca {
             penna.fillRectangle(distanza, -(spessore / 2), spessore, spessore);
             penna.setTransform(trOg);
             tr.dispose();
-        } else if (pAssociata.getVelocita() == 0) {
+        } else if (pAssociata.getVx() < 0.001 && pAssociata.getVy() < 0.001) {
             distanza = dMin;
             nascosto = false;
         }
     }
-
+    
     public void colpisci() {
         if (!anim) {
             anim = true;
@@ -70,8 +70,8 @@ public class Stecca {
         if (distanza < Pallina.getRaggio()*2) {
             anim = false;
             nascosto = true;
-            pAssociata.setVx(Math.cos(Math.toRadians(180+rotazione))*(push*10));
-            pAssociata.setVy(Math.sin(Math.toRadians(180+rotazione))*(push*10));
+            pAssociata.setVx(Math.cos(Math.toRadians(180+rotazione))*(push*5));
+            pAssociata.setVy(Math.sin(Math.toRadians(180+rotazione))*(push*5));
             return;
         }
         distanza -= 20;

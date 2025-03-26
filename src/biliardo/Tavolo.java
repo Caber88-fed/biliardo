@@ -8,7 +8,7 @@ import org.eclipse.jface.resource.JFaceResources;
 
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
-
+import javax.swing.JOptionPane;
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.SWT;
@@ -200,16 +200,53 @@ public class Tavolo {
 
 				// giocatore
 				gioc.update(canvas.getBounds().width,canvas.getBounds().height, p, -1, Pallina.getRaggio());
-				gioc.disegna(penna);
-
-				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
-				for (int i = 0; i < b.length; i++) {
-					for (int j = 0; j < p.length; j++) {
-						if (p[j] != null && b[i].dentro(p[j])) {
-							p[j] = null;
+				 boolean sent=false;
+				for(int i=0;i<b.length;i++) {
+					if(sent==true) {
+						int j=0;
+						while(Pallina.isMoving(p)==true) {
+							j++;
 						}
+						gioc.disegna(penna);
+						
+					}else {
+						gioc.disegna(penna);
 					}
 				}
+				
+				
+				
+					for (int i = 0; i < b.length; i++) {
+						for (int j = 0; j < p.length; j++) {
+							if (p[j] != null && b[i].dentro(p[j])) {
+								if(j==4) {
+									boolean go=false;
+											for(int c=0;j<b.length;c++) {
+												for(int x=0;x<p.length;x++) {
+													if(x!=4 && b[c].dentro(p[x])==false) {
+														JOptionPane.showMessageDialog(null, "PALLINA NERA IMBUCATA PRIMA DELLE ALTRE", "GAME OVER!!!!",2);
+														go=true;
+														break;
+													}
+													if(go=true) {
+														break;
+													}
+												}
+												if(go=true) {
+													break;
+												}
+											}
+											
+								}
+								p[j] = null;
+							}
+						}
+					}	
+				
+				//gioc.disegna(penna);
+
+				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
+				
 				///////////////////////////////////////////////////////////
 
 				// PALLINA GIOCATORE CHE RITORNA AL CENTRO SE DENTRO BUCA
@@ -219,6 +256,15 @@ public class Tavolo {
 					}
 				}
 				///////////////////////////////////////////////////////////
+				
+				
+				//CONTROLLO GAMEOVER	
+				/*if(p[4].gameOver(b,p)==true) {
+					JOptionPane.showMessageDialog(null, "PALLINA NERA IMBUCATA PRIMA DELLE ALTRE", "GAME OVER!!!!",2);
+				}*/
+				
+				
+				
 
 
 				arg0.gc.drawImage(image, 0, 0);

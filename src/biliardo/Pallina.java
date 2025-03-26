@@ -137,4 +137,44 @@ public class Pallina {
     public void setVy(double vy) {
         this.vy = vy;
     }
+
+	public double getVx() {
+		return vx;
+	}
+
+	public double getVy() {
+		return vy;
+	}
+	
+	
+	public static boolean isMoving(Pallina[] p) {
+		for(int i=0;i<p.length;i++) {
+			if(p[i].getVx()!=0 || p[i].getVy()!=0) {
+				return true;
+			}
+		}
+		return false;
+	}
+    
+	public boolean gameOver(Buca[] b, Pallina[] p) {
+		for(int i=0;i<b.length;i++) {
+			if(b[i].dentro(this)) {
+				boolean sent=false;
+				for(int j=0;j<b.length;j++) {
+					for(int x=0;x<p.length;x++) {
+						if(x!=4 && b[j].dentro(p[x])==false) {
+							sent=true;
+						}
+					}
+				}
+				if(sent==true) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+    
 }
