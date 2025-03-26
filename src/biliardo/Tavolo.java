@@ -32,13 +32,17 @@ public class Tavolo {
 	private Pallina gioc;
 	private Buca[] b = new Buca[0];
 	private Stecca st;
-
+	private Stecca st2;
 	// transform per stecca
 	private Transform trOg;
-
+	private int contatore=0;
 	// cambia modalità stecca
 	private boolean misuraPot = false;
 
+	///////////////////////////////////per cambio giocatore ( NON VA :( )////////////////////////////////
+	private boolean pallinaImbucataInQuestoTurno = false;
+	private boolean inAttesaDiFermata = false;
+	
 	// colori palline
 	private final Color[] coloriPalline = {
 			new Color(236, 218, 60), // giallo
@@ -57,10 +61,14 @@ public class Tavolo {
 			new Color(50, 134, 82), // verde
 			new Color(137, 132, 173), // viola + bianco
 	};
+	
+	// giocatore correte
+	static int gcorrente=1;
 
 	// indica se la pallina è bianca
 	private final boolean[] pallineBianche = {false, true, false, false, false, true, true, false, true, false, false, true, true, false, true};
 
+	
 
 	/**
 	 * Launch the application.
@@ -87,6 +95,7 @@ public class Tavolo {
 
 		// Prepara transform per stecca
 		trOg = new Transform(display);
+		
 
 		// refresh del canvas ogni 5ms
 		// necessario per avere movimento fluido e costante
@@ -129,9 +138,17 @@ public class Tavolo {
 			public void mouseUp(MouseEvent e) {
 				// al rilascio del mouse, la stecca colpisce
 				misuraPot = false;
-				st.colpisci();
+				 if (Tavolo.gcorrente == 1) {
+				        st.colpisci();
+				        contatore++;
+				    } else {
+				        st2.colpisci();
+				    }
+				 
+				 
 			}
 		});
+		//PRIMA STECCA
 		canvas.addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(MouseEvent arg0) {
 				// se la stecca è nascosta o in animazione, non si muove
@@ -168,6 +185,47 @@ public class Tavolo {
 				}
 			}
 		});
+		
+		//SECONDA STECCA
+		canvas.addMouseMoveListener(new MouseMoveListener() {
+			public void mouseMove(MouseEvent arg0) {
+				// se la stecca è nascosta o in animazione, non si muove
+				if (st2.isAnim() || st2.isNascosto()) return;
+
+				int xc = gioc.getX() + Pallina.getRaggio();
+				int yc = gioc.getY() + Pallina.getRaggio();
+
+				// altrimenti controlla la modalità
+				if (!misuraPot) {
+					// se !misuraPot, la stecca ruota attorno alla pallina
+
+					int x0 = xc + Pallina.getRaggio();
+					// distanza xc,yc (centro) -> x0,y0 (centro proiettato sul lato sinistro (0 gradi))
+					double a = Math.pow(Pallina.getRaggio(), 2);
+					// distanza xc,yc (centro) -> xm,ym (punto mouse)
+					double b = Math.pow(arg0.x - xc, 2) + Math.pow(arg0.y - yc, 2);
+					// distanza x0,y0 (centro proiettato sul lato sinistro (0 gradi)) -> xm,ym (punto mouse)
+					double c = Math.pow(x0 - arg0.x, 2) + Math.pow(yc - arg0.y, 2);
+
+					double alpha = Math.acos((a + b - c) / (2 * Math.sqrt(a * b)));
+
+					if (arg0.y < yc) {
+						alpha = -alpha;
+					}
+					st.setRotazione((int) Math.toDegrees(alpha));
+				} else {
+					// se misuraPot, la stecca si sposta per dare più o meno forza al colpo
+					double rads = Math.toRadians(st2.getRotazione());
+					int dX = arg0.x - xc;
+					int dY = arg0.y - yc;
+
+					st2.setDistanza((int)((dX*Math.cos(rads)) + (dY*Math.sin(rads))));
+				}
+			}
+		});
+		
+		
+		
 		canvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent arg0) {
 				// buffer
@@ -196,7 +254,31 @@ public class Tavolo {
 				}
 
 				// stecca
-				st.disegna(penna, trOg);
+				//st.disegna(penna, trOg);
+				//int contatore=0;
+				//CONTROLLO QUALE GIOCATORE È IN TURNO
+				if(Tavolo.gcorrente == 1) {
+				    st.mostraStecca(p, gioc);
+				} else {
+				    st2.mostraStecca(p, gioc);
+				}
+				if(Tavolo.gcorrente == 1) {
+				    st.disegna(penna, trOg);
+				    st2.setNascosto(true);  
+				} else {
+				    st2.disegna(penna, trOg);
+				    st.setNascosto(true);  
+				}
+
+			        //pallina imbucata
+			        for (int i = 0; i < b.length; i++) {
+			            for (int j = 0; j < p.length; j++) {
+			                if (p[j] != null && b[i].dentro(p[j])) {
+			                    pallinaImbucataInQuestoTurno = true;
+			                    inAttesaDiFermata = true;
+			                }
+			            }
+			        }
 
 				// giocatore
 				gioc.update(canvas.getBounds().width,canvas.getBounds().height, p, -1, Pallina.getRaggio());
@@ -204,7 +286,7 @@ public class Tavolo {
 				for(int i=0;i<b.length;i++) {
 					if(sent==true) {
 						int j=0;
-						while(Pallina.isMoving(p)==true) {
+						while(Pallina.isMoving(p,gioc)==true) {
 							j++;
 						}
 						gioc.disegna(penna);
@@ -247,6 +329,7 @@ public class Tavolo {
 				//gioc.disegna(penna);
 
 				
+					
 				
 				///////////////////////////////////////////////////////////
 
@@ -298,6 +381,10 @@ public class Tavolo {
 				false);
 
 		st = new Stecca(gioc);
+		st2=new Stecca(gioc);
+		st2.setColore(0,0,0);
+		st.setNascosto(false);  // Giocatore 1 inizia visibile
+		st2.setNascosto(true);  // Giocatore 2 inizia nascosto
 		///////////////////////////////////////////////////////////
 
 		// creazione buche
@@ -311,10 +398,20 @@ public class Tavolo {
 			}
 		}
 		///////////////////////////////////////////////////////////
-
+		//int contatore=0;
+		
+		
+		
 	}
+	
+	
 
 	private void createResourceManager() {
 		localResourceManager = new LocalResourceManager(JFaceResources.getResources(), shell);
 	}
+	
+	public static void setGiocatore(int x) {
+		Tavolo.gcorrente=x;
+	}
+	
 }

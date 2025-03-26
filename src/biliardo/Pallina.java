@@ -147,13 +147,14 @@ public class Pallina {
 	}
 	
 	
-	public static boolean isMoving(Pallina[] p) {
-		for(int i=0;i<p.length;i++) {
-			if(p[i].getVx()!=0 || p[i].getVy()!=0) {
-				return true;
-			}
-		}
-		return false;
+	public static boolean isMoving(Pallina[] palline, Pallina giocatore) {
+	    for(Pallina p : palline) {
+	        if(p != null && (Math.abs(p.getVx()) > 0.01 || Math.abs(p.getVy()) > 0.01)) {
+	            return true;
+	        }
+	    }
+	    //PALLINA GIOCATORE
+	    return Math.abs(giocatore.getVx()) > 0.01 || Math.abs(giocatore.getVy()) > 0.01;
 	}
     
 	

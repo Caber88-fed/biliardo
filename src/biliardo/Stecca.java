@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 public class Stecca {
-    private static final Color colore = new Color(199, 171, 130);
+    private Color colore = new Color(199, 171, 130);
     private final int dMin = Pallina.getRaggio() * 2;
     private final int dMax = dMin + 100;
     private final int spessore = 6; // divisibile per 2
@@ -29,6 +29,17 @@ public class Stecca {
         this.pAssociata = pAssociata;
         push = 0;
     }
+    
+    
+    public void setNascosto(boolean nascosto) {
+		this.nascosto = nascosto;
+	}
+
+
+	public void setColore(int a, int b, int c) {
+    	Color cl=new Color(a,b,c);
+    	this.colore=cl;
+    }
 
     public int getRotazione() {
         return rotazione;
@@ -43,6 +54,7 @@ public class Stecca {
     }
 
     public void disegna(GC penna, Transform trOg) {
+    	if (nascosto) return;
         if (!nascosto) {
             if (anim) colpisci();
             Transform tr = new Transform(penna.getDevice());
@@ -66,16 +78,18 @@ public class Stecca {
         if (!anim) {
             anim = true;
             push = 0;
+            this.setNascosto(false); 
         }
-        if (distanza < Pallina.getRaggio()*2) {
+        if (distanza < Pallina.getRaggio()*4) {
             anim = false;
-            nascosto = true;
+            this.setNascosto(true);  
+            double forza = (dMax - distanza) / 2.0;
             pAssociata.setVx(Math.cos(Math.toRadians(180+rotazione))*(push*5));
             pAssociata.setVy(Math.sin(Math.toRadians(180+rotazione))*(push*5));
-            return;
+        } else {
+            distanza -= 20;
+            push++;
         }
-        distanza -= 20;
-        push++;
     }
 
     public boolean isAnim() {
@@ -85,4 +99,45 @@ public class Stecca {
     public boolean isNascosto() {
         return nascosto;
     }
+    
+    public boolean Punto(Pallina[] p, Buca[] b) {
+        boolean sent = false;
+        for (int i = 0; i < b.length; i++) {
+            for(int j = 0; j < p.length; j++) {
+                if(p[j] != null && b[i].dentro(p[j])) {
+                    sent = true;
+                    break;
+                }
+            }
+            if(sent) break;
+        }
+        return sent;
+    }
+    
+    public static void cambiaTurno() {
+    	if(Tavolo.gcorrente==1) {
+    		Tavolo.setGiocatore(2);
+    	}else {
+    		Tavolo.setGiocatore(1);
+    	}
+    }
+    
+    
+    //la stecca torna visibile quando le palline si fermano ( più carino penso :) )
+    public void mostraStecca(Pallina[] palline, Pallina giocatore) {
+        if (nascosto && !Pallina.isMoving(palline, giocatore)) {
+            nascosto = false;
+            distanza = dMin;  
+        }
+    }
+
+
+	public int getDMin() {
+		return dMin;
+	}
+
+
+	public int getDMax() {
+		return dMax;
+	}
 }
