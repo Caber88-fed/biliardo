@@ -90,8 +90,8 @@ public class Principale {
 		txtP1 = new Text(shell, SWT.BORDER);
 		txtP1.setBounds(160, 273, 83, 30);
 		
-		txtP1.setText("" + Tavolo.punteggio_p1);
-		txtP2.setText("" + Tavolo.punteggio_p2);
+		txtP1.setText("pt1");
+		txtP2.setText("pt2");
 		
 		
 
