@@ -156,25 +156,6 @@ public class Pallina {
 		return false;
 	}
     
-	public boolean gameOver(Buca[] b, Pallina[] p) {
-		for(int i=0;i<b.length;i++) {
-			if(b[i].dentro(this)) {
-				boolean sent=false;
-				for(int j=0;j<b.length;j++) {
-					for(int x=0;x<p.length;x++) {
-						if(x!=4 && b[j].dentro(p[x])==false) {
-							sent=true;
-						}
-					}
-				}
-				if(sent==true) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	
 	
-    
 }

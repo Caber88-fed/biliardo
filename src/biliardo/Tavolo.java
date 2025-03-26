@@ -214,7 +214,8 @@ public class Tavolo {
 					}
 				}
 				
-				
+				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
+				//CONTROLLO GAME OVER
 				
 					for (int i = 0; i < b.length; i++) {
 						for (int j = 0; j < p.length; j++) {
@@ -245,7 +246,7 @@ public class Tavolo {
 				
 				//gioc.disegna(penna);
 
-				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
+				
 				
 				///////////////////////////////////////////////////////////
 
@@ -257,11 +258,6 @@ public class Tavolo {
 				}
 				///////////////////////////////////////////////////////////
 				
-				
-				//CONTROLLO GAMEOVER	
-				/*if(p[4].gameOver(b,p)==true) {
-					JOptionPane.showMessageDialog(null, "PALLINA NERA IMBUCATA PRIMA DELLE ALTRE", "GAME OVER!!!!",2);
-				}*/
 				
 				
 				
