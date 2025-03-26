@@ -56,7 +56,7 @@ public class Stecca {
             penna.fillRectangle(distanza, -(spessore / 2), spessore, spessore);
             penna.setTransform(trOg);
             tr.dispose();
-        } else if (pAssociata.getVx() < 0.001 && pAssociata.getVy() < 0.001) {
+        } else if (pAssociata.getVx() == 0 && pAssociata.getVy() == 0 && !pAssociata.isNascosto()) {
             distanza = dMin;
             nascosto = false;
         }

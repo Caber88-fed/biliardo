@@ -18,6 +18,8 @@ public class Pallina {
     private double vx;
     private double vy;
 
+    private boolean nascosto = false;
+
     public Pallina(int x, int y, Color c, boolean bianca, String tipo) {
         this.x = x;
         this.y = y;
@@ -28,6 +30,7 @@ public class Pallina {
         this.xinit = x;
         this.yinit = y;
         this.tipo=tipo;
+        this.nascosto = false;
     }
 
     public static String getTipo() {
@@ -131,6 +134,7 @@ public class Pallina {
     }
 
     public void disegna(GC penna) {
+        if (this.nascosto) return;
         penna.setBackground(colore);
         penna.fillOval(x, y, raggio * 2, raggio * 2);
         if (bianca) {
@@ -158,13 +162,18 @@ public class Pallina {
 	
 	public static boolean isMoving(Pallina[] p) {
 		for(int i=0;i<p.length;i++) {
-			if(p[i].getVx()!=0 || p[i].getVy()!=0) {
+			if(p[i] != null && (p[i].getVx()!=0 || p[i].getVy()!=0)) {
 				return true;
 			}
 		}
 		return false;
 	}
-    
-	
-	
+
+    public boolean isNascosto() {
+        return nascosto;
+    }
+
+    public void setNascosto(boolean nascosto) {
+        this.nascosto = nascosto;
+    }
 }
