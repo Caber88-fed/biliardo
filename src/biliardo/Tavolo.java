@@ -216,19 +216,10 @@ public class Tavolo {
 
 				// giocatore
 				gioc.update(canvas.getBounds().width,canvas.getBounds().height, p, -1, Pallina.getRaggio());
-				 boolean sent=false;
-				for(int i=0;i<b.length;i++) {
-					if(sent==true) {
-						int j=0;
-						while(Pallina.isMoving(p)==true) {
-							j++;
-						}
-						gioc.disegna(penna);
-						
-					}else {
-						gioc.disegna(penna);
-					}
+				if (gioc.isNascosto() && !Pallina.isMoving(p)) {
+					gioc.setNascosto(false);
 				}
+				gioc.disegna(penna);
 				
 				// PALLINE CHE SCOMPAIONO SE DENTRO BUCA
 				//CONTROLLO GAME OVER
@@ -266,25 +257,17 @@ public class Tavolo {
 							}
 						}
 					}	
-				
-				//gioc.disegna(penna);
 
-				
-				
 				///////////////////////////////////////////////////////////
 
 				// PALLINA GIOCATORE CHE RITORNA AL CENTRO SE DENTRO BUCA
 				for (int i = 0; i < b.length; i++) {
 					if (b[i].dentro(gioc)) {
+						gioc.setNascosto(Pallina.isMoving(p));
 						gioc.reset();
 					}
 				}
 				///////////////////////////////////////////////////////////
-				
-				
-				
-				
-
 
 				arg0.gc.drawImage(image, 0, 0);
 
