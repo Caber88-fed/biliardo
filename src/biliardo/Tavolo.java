@@ -38,8 +38,6 @@ public class Tavolo {
     private int[] punteggio = {0, 0};
     private int g1tipo = -1;
 
-    private boolean isGameOver = false;
-
     // transform per stecca
     private Transform trOg;
 
@@ -230,7 +228,9 @@ public class Tavolo {
                 // PALLINE CHE SCOMPAIONO SE DENTRO BUCA
                 //CONTROLLO GAME OVER
 
-                gameOver(p);
+                if (gameOver(p)) {;
+                    shell.close();
+                }
 
                 int nbuche = 0;
                 for (int i = 0; i < b.length; i++) {
@@ -246,7 +246,7 @@ public class Tavolo {
                                 if (st.isTurnoG1()) {
                                     g1tipo = tipo;
                                 } else {
-                                    g1tipo = Math.abs(1-tipo);
+                                    g1tipo = Math.abs(1 - tipo);
                                 }
                             }
 
@@ -261,8 +261,8 @@ public class Tavolo {
                             p[j] = null;
 
                             // aggiorna pt
-                            lblG1.setText(""+punteggio[g1tipo]);
-                            lblG2.setText(""+punteggio[Math.abs(1-g1tipo)]);
+                            lblG1.setText("" + punteggio[g1tipo]);
+                            lblG2.setText("" + punteggio[Math.abs(1 - g1tipo)]);
 
                             // conta palline in buca in questo round
                             nbuche++;
@@ -352,21 +352,33 @@ public class Tavolo {
 
     }
 
-    private void gameOver(Pallina[] p) {
-        if (isGameOver) return;
+    private boolean gameOver(Pallina[] p) {
         boolean pallinaNera = false;
+        int[] pRimanenti = {0, 0};
         int i = 0;
         while (!pallinaNera && i < p.length) {
-            if (p[i] != null && p[i].getTipo() == 2) {
-                pallinaNera = true;
+            if (p[i] != null) {
+                if (p[i].getTipo() == 2) {
+                    pallinaNera = true;
+                } else if (p[i].getTipo() == 0 || p[i].getTipo() == 1) {
+                    pRimanenti[p[i].getTipo()]++;
+                }
             }
             i++;
         }
         if (!pallinaNera) {
-            JOptionPane.showMessageDialog(null, "PALLINA NERA IMBUCATA PRIMA DELLE ALTRE", "GAME OVER!!!!", 2);
-            isGameOver = true;
-            return;
+            if (pRimanenti[0] != 0 && pRimanenti[1] != 0) {
+                JOptionPane.showMessageDialog(null, "PALLINA NERA IMBUCATA PRIMA DELLE ALTRE", "GAME OVER!!!!", 2);
+                return true;
+            } else {
+                int giocCorr;
+                if (st.isTurnoG1()) giocCorr = 1;
+                else giocCorr = 2;
+                JOptionPane.showMessageDialog(null, "HA VINTO IL GIOCATORE " + giocCorr, "GAME OVER!!!!", 2);
+                return true;
+            }
         }
+        return false;
     }
 
     private void createResourceManager() {
