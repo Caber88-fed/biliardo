@@ -103,8 +103,10 @@ public class Tavolo {
         final int refreshMS = 5;
         Runnable runnable = new Runnable() {
             public void run() {
-                canvas.redraw();
-                display.timerExec(refreshMS, this);
+                if (!canvas.isDisposed()) {
+                    canvas.redraw();
+                    display.timerExec(refreshMS, this);
+                }
             }
         };
         display.timerExec(refreshMS, runnable);
@@ -126,9 +128,6 @@ public class Tavolo {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				Principale.shell.setVisible(true);
-				shell.setVisible(false);
-
-
 			}
 		});
 		// Colore bordo
