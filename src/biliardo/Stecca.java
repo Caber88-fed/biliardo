@@ -8,6 +8,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class Stecca {
     private static final Color colore = new Color(199, 171, 130);
+    private static final Color cg1 = new Color(255,179,186);
+    private static final Color cg2 = new Color(86,225,255);
+    private boolean turnoG1 = true;
     private final int dMin = Pallina.getRaggio() * 2;
     private final int dMax = dMin + 100;
     private final int spessore = 6; // divisibile per 2
@@ -20,6 +23,8 @@ public class Stecca {
 
     private final Pallina pAssociata;
     private int push;
+
+    private boolean colpito;
 
     public Stecca(Pallina pAssociata) {
         rotazione = 0;
@@ -50,7 +55,11 @@ public class Stecca {
             tr.translate(pAssociata.getX() + Pallina.getRaggio(), pAssociata.getY() + Pallina.getRaggio());
             tr.rotate(rotazione);
             penna.setTransform(tr);
-            penna.setBackground(colore);
+            if (turnoG1) {
+                penna.setBackground(cg1);
+            } else {
+                penna.setBackground(cg2);
+            }
             penna.fillRectangle(distanza, -(spessore / 2), lunghezza, spessore);
             penna.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             penna.fillRectangle(distanza, -(spessore / 2), spessore, spessore);
@@ -70,6 +79,7 @@ public class Stecca {
         if (distanza < Pallina.getRaggio()*2) {
             anim = false;
             nascosto = true;
+            colpito = true;
             pAssociata.setVx(Math.cos(Math.toRadians(180+rotazione))*(push*5));
             pAssociata.setVy(Math.sin(Math.toRadians(180+rotazione))*(push*5));
             return;
@@ -84,5 +94,21 @@ public class Stecca {
 
     public boolean isNascosto() {
         return nascosto;
+    }
+
+    public boolean isTurnoG1() {
+        return turnoG1;
+    }
+
+    public void setTurnoG1(boolean turnoG1) {
+        this.turnoG1 = turnoG1;
+    }
+
+    public boolean isColpito() {
+        return colpito;
+    }
+
+    public void setColpito(boolean colpito) {
+        this.colpito = colpito;
     }
 }
