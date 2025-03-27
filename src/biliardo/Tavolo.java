@@ -17,6 +17,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 public class Tavolo {
 
@@ -117,6 +119,15 @@ public class Tavolo {
 	protected void createContents() {
 		shell = new Shell();
 		createResourceManager();
+		shell.addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent e) {
+				Principale.shell.setVisible(true);
+				shell.setVisible(false);
+				
+				
+			}
+		});
 		// Colore bordo
 		shell.setBackground(localResourceManager.create(ColorDescriptor.createFrom(new Color(163, 106, 63))));
 		shell.setSize(852, 497);
