@@ -140,7 +140,7 @@ public class Principale {
 		lblCaberlottoFrancesco.setBounds(50, 440, 175, 25);
 		lblCaberlottoFrancesco.setText("Caberlotto Francesco");
 		Color c=new Color(0,0,0);
-		p=new Pallina(canvas.getBounds().width/2, canvas.getBounds().height/2, c, false, "piena");
+		p=new Pallina(canvas.getBounds().width/2, canvas.getBounds().height/2, c, 0);
 
 	}
 	private void createResourceManager() {
