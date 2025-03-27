@@ -17,6 +17,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.jface.resource.FontDescriptor;
 
 public class Tavolo {
 
@@ -67,6 +69,8 @@ public class Tavolo {
     // 2 = nera
     // -1 = giocatore
     private final int[] tipiPalline = {0, 1, 0, 0, 2, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1};
+    private Label lblG1;
+    private Label lblG2;
 
     /**
      * Launch the application.
@@ -217,7 +221,7 @@ public class Tavolo {
 
                 gameOver(p);
 
-
+                int nbuche = 0;
                 for (int i = 0; i < b.length; i++) {
                     for (int j = 0; j < p.length; j++) {
                         // pallina in buca
@@ -228,17 +232,45 @@ public class Tavolo {
                                 punteggio[tipo]++;
                             }
                             if (g1tipo == -1) {
-                                g1tipo = tipo;
+                                if (st.isTurnoG1()) {
+                                    g1tipo = tipo;
+                                } else {
+                                    g1tipo = Math.abs(1-tipo);
+                                }
                             }
+
+                            // cambio giocatore se palla opposta in buca
+                            if (st.isTurnoG1() && p[j].getTipo() != g1tipo) {
+                                st.setTurnoG1(false);
+                            } else if (!st.isTurnoG1() && p[j].getTipo() == g1tipo) {
+                                st.setTurnoG1(true);
+                            }
+
                             // cancella pallina
                             p[j] = null;
+
+                            // aggiorna pt
+                            lblG1.setText(""+punteggio[g1tipo]);
+                            lblG2.setText(""+punteggio[Math.abs(1-g1tipo)]);
+
+                            // conta palline in buca in questo round
+                            nbuche++;
                         }
                     }
+
                     // Giocatore in buca
                     if (b[i].dentro(gioc)) {
                         gioc.setNascosto(Pallina.isMoving(p));
                         gioc.reset();
                     }
+                }
+
+                // cambia turno per colpo a vuoto
+                if (st.isColpito() && nbuche == 0) {
+                    st.setTurnoG1(!st.isTurnoG1());
+                    st.setColpito(false);
+                } else if (st.isColpito()) {
+                    st.setColpito(false);
                 }
 
                 arg0.gc.drawImage(image, 0, 0);
@@ -255,6 +287,22 @@ public class Tavolo {
         // width = shellWidth - 16 - bordo*2
         // height = shellHeight - 39 - bordo*2
         canvas.setBounds(25, 25, 786, 408);
+        
+        lblG1 = new Label(shell, SWT.NONE);
+        lblG1.setForeground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(255, 179, 186))));
+        lblG1.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TRANSPARENT));
+        lblG1.setFont(localResourceManager.create(FontDescriptor.createFrom("Arial", 20, SWT.BOLD | SWT.ITALIC)));
+        lblG1.setAlignment(SWT.CENTER);
+        lblG1.setBounds(0, 0, 30, 32);
+        lblG1.setText("0");
+        
+        lblG2 = new Label(shell, SWT.NONE);
+        lblG2.setForeground(localResourceManager.create(ColorDescriptor.createFrom(new RGB(186, 225, 255))));
+        lblG2.setText("0");
+        lblG2.setFont(localResourceManager.create(FontDescriptor.createFrom("Arial", 20, SWT.BOLD | SWT.ITALIC)));
+        lblG2.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TRANSPARENT));
+        lblG2.setAlignment(SWT.CENTER);
+        lblG2.setBounds(806, 0, 30, 32);
 
         // creazione palline
         int xb = 75 * canvas.getBounds().width / 100 - Pallina.getRaggio();
